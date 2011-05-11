@@ -103,27 +103,42 @@ class TestNodeParser(unittest.TestCase):
         self.assertRaises(ValueError, NodeParser._get_boolean, self._etree_with_data('2'), required=False, strict=True)
 
     def test__get_date_required(self):
+        import time
+        from datetime import datetime
         from kayako.core.lib import NodeParser, FOREVER
 
-        assert NodeParser._get_date(self._etree_with_data('123'), required=True) == 123
+        timestamp = int(time.mktime(datetime.now().timetuple()))
+        now = datetime.fromtimestamp(timestamp)
+
+        assert NodeParser._get_date(self._etree_with_data(timestamp), required=True) == now
         assert NodeParser._get_date(self._etree_with_data('0'), required=True) == FOREVER
         self.assertRaises(AttributeError, NodeParser._get_date, None, required=True)
         self.assertRaises(TypeError, NodeParser._get_date, self._etree_with_data(''), required=True)
         self.assertRaises(ValueError, NodeParser._get_date, self._etree_with_data('abc'), required=True)
 
     def test__get_date_optional(self):
+        import time
+        from datetime import datetime
         from kayako.core.lib import NodeParser, FOREVER
 
-        assert NodeParser._get_date(self._etree_with_data('123'), required=False, strict=False) == 123
+        timestamp = int(time.mktime(datetime.now().timetuple()))
+        now = datetime.fromtimestamp(timestamp)
+
+        assert NodeParser._get_date(self._etree_with_data(timestamp), required=False, strict=False) == now
         assert NodeParser._get_date(self._etree_with_data('0'), required=True) == FOREVER
         assert NodeParser._get_date(None, required=False, strict=False) == None
         assert NodeParser._get_date(self._etree_with_data(''), required=False, strict=False) == None
         assert NodeParser._get_date(self._etree_with_data('abc'), required=False, strict=False) == None
 
     def test__get_date_strict(self):
+        import time
+        from datetime import datetime
         from kayako.core.lib import NodeParser, FOREVER
 
-        assert NodeParser._get_date(self._etree_with_data('123'), required=False, strict=True) == 123
+        timestamp = int(time.mktime(datetime.now().timetuple()))
+        now = datetime.fromtimestamp(timestamp)
+
+        assert NodeParser._get_date(self._etree_with_data(timestamp), required=False, strict=True) == now
         assert NodeParser._get_date(self._etree_with_data('0'), required=True) == FOREVER
         assert NodeParser._get_date(None, required=False, strict=True) == None
         assert NodeParser._get_date(self._etree_with_data(''), required=False, strict=True) == None

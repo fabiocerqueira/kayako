@@ -60,9 +60,9 @@ class KayakoAPI:
     
     **API Factory Methods:**
     
-    ``api.create(Object)``
+    ``api.create(Object, *args, **kwargs)``
     
-        Create and return a new KayakoObject of the type given.
+        Create a new KayakoObject of the type given, passing in args and kwargs.
         
     ``api.get_all(Object, *args, **kwargs)``
     
@@ -294,11 +294,11 @@ class KayakoAPI:
 
     ## { Persistence Layer
 
-    def create(self, object):
+    def create(self, object, *args, **kwargs):
         '''
-        Create a new KayakoObject of the type given.
+        Create a new KayakoObject of the type given, passing in args and kwargs.
         '''
-        return object(self)
+        return object(self, *args, **kwargs)
 
     def get_all(self, object, *args, **kwargs):
         '''

@@ -9,7 +9,7 @@ Created on May 9, 2011
 
 @author: evan
 '''
-from kayako.tests import KayakoAPITest
+from kayako.test import KayakoAPITest
 
 class TestUser(KayakoAPITest):
 

@@ -10,7 +10,7 @@ Created on May 5, 2011
 @author: evan
 '''
 
-from kayako.tests import KayakoAPITest
+from kayako.test import KayakoAPITest
 
 class TestKayakoAPI(KayakoAPITest):
 
@@ -122,31 +122,31 @@ class TestKayakoAPI(KayakoAPITest):
 
     def test_get(self):
         r = self.api._request('/Core/Test', 'GET')
-        body = r.read()
+        assert r.read()
         assert r.getcode() == 200, r.getcode()
         r = self.api._request('/Core/Test', 'GET', test='just a test')
-        body = r.read()
+        assert r.read()
         assert r.getcode() == 200, r.getcode()
         r = self.api._request('/Core/Test/1', 'GET')
-        body = r.read()
+        assert r.read()
         assert r.getcode() == 200, r.getcode()
         r = self.api._request('/Core/Test/1', 'GET', test='just a test')
-        body = r.read()
+        assert r.read()
         assert r.getcode() == 200, r.getcode()
 
     def test_post(self):
         r = self.api._request('/Core/Test', 'POST')
-        body = r.read()
+        assert r.read()
         assert r.getcode() == 200, r.getcode()
 
     def test_put(self):
         r = self.api._request('/Core/Test/1', 'PUT', x=234)
-        body = r.read()
+        assert r.read()
         assert r.getcode() == 200, r.getcode()
 
     def test_delete(self):
         r = self.api._request('/Core/Test/1', 'DELETE')
-        body = r.read()
+        assert r.read()
         assert r.getcode() == 200, r.getcode()
 
     def test_get_department(self):
@@ -159,6 +159,16 @@ class TestKayakoAPI(KayakoAPITest):
         from kayako.objects import Department
         d = self.api.create(Department)
         self.assertEqual(d.id, UnsetParameter)
+
+    def test_creat_with_kwargs(self):
+        from kayako.objects import Department
+        d = self.api.create(Department, title='test_dept')
+        assert d.title == 'test_dept'
+
+    def test_creat_with_bad_kwargs(self):
+        from kayako.objects import Department
+        self.assertRaises(TypeError, self.api.create, Department, bad_kwarg='bad_kwarg')
+
 
 
 

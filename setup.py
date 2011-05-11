@@ -16,8 +16,8 @@ setup(
     author='Evan Leis',
     author_email='engineergod@yahoo.com',
     url='',
-    install_requires=[
-        "lxml",
+    requires=[
+        'lxml',
     ],
     setup_requires=[],
     packages=find_packages(exclude=[]),

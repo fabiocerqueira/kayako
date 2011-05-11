@@ -109,32 +109,47 @@ class TestKayakoRequestParser(unittest.TestCase):
         self.assertRaises(KayakoResponseError, KayakoRequestParser._get_boolean, self._etree_with_data('2'), required=False, strict=True)
 
     def test__get_date_required(self):
+        import time
+        from datetime import datetime
         from kayako.exception import KayakoResponseError
         from kayako.core.lib import FOREVER
         from kayako.core.object import KayakoRequestParser
 
-        assert KayakoRequestParser._get_date(self._etree_with_data('123'), required=True) == 123
+        timestamp = int(time.mktime(datetime.now().timetuple()))
+        now = datetime.fromtimestamp(timestamp)
+
+        self.assertEqual(KayakoRequestParser._get_date(self._etree_with_data(timestamp), required=True), now)
         assert KayakoRequestParser._get_date(self._etree_with_data('0'), required=True) == FOREVER
         self.assertRaises(KayakoResponseError, KayakoRequestParser._get_date, None, required=True)
         self.assertRaises(KayakoResponseError, KayakoRequestParser._get_date, self._etree_with_data(''), required=True)
         self.assertRaises(KayakoResponseError, KayakoRequestParser._get_date, self._etree_with_data('abc'), required=True)
 
     def test__get_date_optional(self):
+        import time
+        from datetime import datetime
         from kayako.core.lib import FOREVER
         from kayako.core.object import KayakoRequestParser
 
-        assert KayakoRequestParser._get_date(self._etree_with_data('123'), required=False, strict=False) == 123
+        timestamp = int(time.mktime(datetime.now().timetuple()))
+        now = datetime.fromtimestamp(timestamp)
+
+        self.assertEqual(KayakoRequestParser._get_date(self._etree_with_data(timestamp), required=False, strict=False) , now)
         assert KayakoRequestParser._get_date(self._etree_with_data('0'), required=True) == FOREVER
         assert KayakoRequestParser._get_date(None, required=False, strict=False) == None
         assert KayakoRequestParser._get_date(self._etree_with_data(''), required=False, strict=False) == None
         assert KayakoRequestParser._get_date(self._etree_with_data('abc'), required=False, strict=False) == None
 
     def test__get_date_strict(self):
+        import time
+        from datetime import datetime
         from kayako.exception import KayakoResponseError
         from kayako.core.lib import FOREVER
         from kayako.core.object import KayakoRequestParser
 
-        assert KayakoRequestParser._get_date(self._etree_with_data('123'), required=False, strict=True) == 123
+        timestamp = int(time.mktime(datetime.now().timetuple()))
+        now = datetime.fromtimestamp(timestamp)
+
+        self.assertEqual(KayakoRequestParser._get_date(self._etree_with_data(timestamp), required=False, strict=True) , now)
         assert KayakoRequestParser._get_date(self._etree_with_data('0'), required=True) == FOREVER
         assert KayakoRequestParser._get_date(None, required=False, strict=True) == None
         assert KayakoRequestParser._get_date(self._etree_with_data(''), required=False, strict=True) == None

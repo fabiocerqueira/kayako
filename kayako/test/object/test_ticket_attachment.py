@@ -5,7 +5,7 @@ Created on May 10, 2011
 @author: evan
 '''
 
-from kayako.tests import KayakoAPITest
+from kayako.test import KayakoAPITest
 
 class TestTicketAttachment(KayakoAPITest):
 

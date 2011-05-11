@@ -2,7 +2,7 @@ Python API wrapper for Kayako 4.01.204
 --------------------------------------
     
 *NOTE: Tests require your input. To test this code against your installation of 
-Kayako, modify kayako.tests.__init__.py filling in API_URL, API_KEY, and 
+Kayako, modify kayako.test.__init__.py filling in API_URL, API_KEY, and 
 SECRET_KEY.*
 
 **Usage:**
@@ -38,16 +38,17 @@ SECRET_KEY.*
 
 **API Factory Methods:**
 
-``api.create(Object)``
+``api.create(Object, *args, **kwargs)``
 
-    Create and return a new KayakoObject of the type given.
+    Create and return a new KayakoObject of the type given passing in args and kwargs.
     
 ``api.get_all(Object, *args, **kwargs)``
 
     *Get all Kayako Objects of the given type.*
     *In most cases, all items are returned.*
     
-    e.x.::
+    e.x. ::
+    
         api.get_all(Department)
         >>> [<Department....>, ....]
 
@@ -71,9 +72,10 @@ SECRET_KEY.*
 
     *Get a Kayako Object of the given type by ID.*
     
-    e.x.
-        ``api.get(User, 112359)``
-        ``>>> <User (112359)....>``
+    e.x. ::
+    
+        api.get(User, 112359)
+        >>> <User (112359)....>
     
     *Special Cases:*
         
