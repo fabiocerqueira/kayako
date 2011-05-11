@@ -1,0 +1,1 @@
+recursive-include kayako *.txt *.py
