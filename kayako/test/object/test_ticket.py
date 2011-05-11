@@ -49,7 +49,7 @@ class TestTicket(KayakoAPITest):
         result = self.api.get_all(Ticket, dept.id, ticketstatusid=[1], ownerstaffid=[1], userid=[1])
         assert isinstance(result, list)
 
-        #ticket.delete()
+        ticket.delete()
 
     def test_get_ticket(self):
         from kayako.objects import Department, Ticket
