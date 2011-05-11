@@ -1,10 +1,6 @@
 Python API wrapper for Kayako 4.01.204
 --------------------------------------
     
-*NOTE: Tests require your input. To test this code against your installation of 
-Kayako, modify kayako.test.__init__.py filling in API_URL, API_KEY, and 
-SECRET_KEY.*
-
 **Usage:**
 
 ::
