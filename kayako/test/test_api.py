@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------------
 # Copyright (c) 2011, Evan Leis
 #
-# Distributed under the terms of the GNU General Public License (GPL)
+# Distributed under the terms of the Lesser GNU General Public License (LGPL)
 #-----------------------------------------------------------------------------
 '''
 Created on May 5, 2011

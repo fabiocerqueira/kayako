@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------------
 # Copyright (c) 2011, Evan Leis
 #
-# Distributed under the terms of the GNU General Public License (GPL)
+# Distributed under the terms of the Lesser GNU General Public License (LGPL)
 #-----------------------------------------------------------------------------
 
 from setuptools import setup, find_packages
@@ -12,7 +12,9 @@ with open('kayako/README.txt') as readme:
 
 setup(
     name='kayako',
-    version='4.01.204',
+    version='1.0',
+    description="Python API Wrapper for Kayako 4.01.204",
+    long_description=long_description,
     author='Evan Leis',
     author_email='engineergod@yahoo.com',
     url='',
@@ -27,17 +29,15 @@ setup(
     zip_safe=True,
     entry_points="""
     """,
-    license="GNU General Public License (GPL)",
+    license="Lesser GNU General Public License (LGPL)",
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.6",
         "Development Status :: 4 - Beta",
         "Environment :: Other Environment",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: GNU General Public License (GPL)",
+        "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)",
         "Operating System :: OS Independent",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    description="Python API Wrapper for Kayako 4.01.204",
-    long_description=long_description,
 )
