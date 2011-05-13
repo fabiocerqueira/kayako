@@ -12,13 +12,13 @@ with open('kayako/README.txt') as readme:
 
 setup(
     name='kayako',
-    version='1.0',
+    version='1.0.01',
     description="Python API Wrapper for Kayako 4.01.204",
     long_description=long_description,
     author='Evan Leis',
     author_email='engineergod@yahoo.com',
     url='',
-    requires=[
+    install_requires=[
         'lxml',
     ],
     setup_requires=[],
