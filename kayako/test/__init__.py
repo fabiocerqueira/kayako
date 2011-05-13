@@ -16,9 +16,9 @@ import unittest
 
 class KayakoAPITest(unittest.TestCase):
 
-    SECRET_KEY = ''
-    API_KEY = ''
     API_URL = ''
+    API_KEY = ''
+    SECRET_KEY = ''
 
     @property
     def api(self):

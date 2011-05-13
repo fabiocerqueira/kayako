@@ -24,6 +24,10 @@ class TestTicketPriority(KayakoAPITest):
         assert 'TicketPriority' in str(result)
         self.assertEqual(result.id, 1)
 
+    def test_get_nonexistant(self):
+        from kayako.objects import TicketPriority
+        self.assertEqual(self.api.get(TicketPriority, '123123'), None)
+
 class TestTicketStatus(KayakoAPITest):
 
     def test_get_all(self):
@@ -36,6 +40,10 @@ class TestTicketStatus(KayakoAPITest):
         result = self.api.get(TicketStatus, 1)
         assert 'TicketStatus' in str(result)
         self.assertEqual(result.id, 1)
+
+    def test_get_nonexistant(self):
+        from kayako.objects import TicketStatus
+        self.assertEqual(self.api.get(TicketStatus, '123123'), None)
 
 class TestTicketType(KayakoAPITest):
 
@@ -50,6 +58,10 @@ class TestTicketType(KayakoAPITest):
         result = self.api.get(TicketType, 1)
         assert 'TicketType' in str(result)
         self.assertEqual(result.id, 1)
+
+    def test_get_nonexistant(self):
+        from kayako.objects import TicketType
+        self.assertEqual(self.api.get(TicketType, '123123'), None)
 
 
 

@@ -12,6 +12,28 @@ Created on May 9, 2011
 from kayako.test import KayakoAPITest
 class TestStaff(KayakoAPITest):
 
+    def test_add_get_nonexistant(self):
+        from kayako.objects import Staff
+        obj = self.api.get(Staff, '123123')
+        assert obj is None
+
+    def test_add_get_bare(self):
+        from kayako.objects import Staff
+        obj = self.api.create(Staff, firstname='DELETEME', lastname='DELETEME', username='DELETEME', email='deleteme@example.com', password='DELETEME', staffgroupid=1)
+        obj.add()
+        obj2 = self.api.get(Staff, obj.id) # Shouldn't raise errors
+        obj.delete()
+        assert obj2 is not None
+
+    def test_add_get_full(self):
+        from kayako.objects import Staff
+        obj = self.api.create(Staff, firstname='DELETEME', lastname='DELETEME', username='DELETEME', email='deleteme@example.com', password='DELETEME', staffgroupid=1,
+                              designation='TEST', mobilenumber='123-456-7890', signature='TEST', isenabled=False, greeting='Mr.', timezone='MST', enabledst=True)
+        obj.add()
+        obj2 = self.api.get(Staff, obj.id) # Shouldn't raise errors
+        obj.delete()
+        assert obj2 is not None
+
     def test_get_staff(self):
         from kayako.objects import Staff
         d = self.api.get(Staff, 1)
@@ -135,6 +157,27 @@ class TestStaff(KayakoAPITest):
         self.assertRaises(KayakoRequestError, staff.delete)
 
 class TestStaffGroup(KayakoAPITest):
+
+    def test_add_get_nonexistant(self):
+        from kayako.objects import StaffGroup
+        obj = self.api.get(StaffGroup, 123123123)
+        assert obj is None
+
+    def test_add_get_bare(self):
+        from kayako.objects import StaffGroup
+        obj = self.api.create(StaffGroup, title='DELETEME', isadmin=False)
+        obj.add()
+        obj2 = self.api.get(StaffGroup, obj.id) # Shouldn't raise errors
+        obj.delete()
+        assert obj2 is not None
+
+    def test_add_get_full(self):
+        from kayako.objects import StaffGroup
+        obj = self.api.create(StaffGroup, title='DELETEME', isadmin=False)
+        obj.add()
+        obj2 = self.api.get(StaffGroup, obj.id) # Shouldn't raise errors
+        obj.delete()
+        assert obj2 is not None
 
     def test_get_staffgroup(self):
         from kayako.objects import StaffGroup

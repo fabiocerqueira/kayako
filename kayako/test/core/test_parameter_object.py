@@ -18,6 +18,7 @@ class TestParameterObject(unittest.TestCase):
         from kayako.core.lib import ParameterObject, UnsetParameter
 
         class obj(ParameterObject):
+            __parameters__ = ['prop1', 'prop2', 'resp1']
             __request_parameters__ = ['prop1', 'prop2']
             __response_parameters__ = ['resp1']
 
@@ -31,20 +32,23 @@ class TestParameterObject(unittest.TestCase):
 
         o.resp1 = 'test'
 
-        params = o.request_parameters
+        params = o._parameters_from_list(o.__request_parameters__)
         assert 'prop1' in params
         assert 'prop2' not in params
         assert 'resp1' not in params
-        respparams = o.response_parameters
+        respparams = o._parameters_from_list(o.__response_parameters__)
         assert 'prop1' not in respparams
         assert 'prop2' not in respparams
         assert respparams['resp1'] == 'test'
         assert len(params) == 1
 
+        assert len(o.parameters) == 2
+
     def test_multiple_objects_can_have_different_values(self):
         from kayako.core.lib import ParameterObject
 
         class obj(ParameterObject):
+            __parameters__ = ['prop1', 'prop2']
             __request_parameters__ = ['prop1', 'prop2']
 
         obj1 = obj(prop1='old')
@@ -56,6 +60,7 @@ class TestParameterObject(unittest.TestCase):
         from kayako.core.lib import ParameterObject
 
         class obj(ParameterObject):
+            __parameters__ = ['prop1', 'prop2']
             __request_parameters__ = ['prop1', 'prop2']
 
         self.assertRaises(TypeError, obj, prop3='fake')

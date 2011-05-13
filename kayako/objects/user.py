@@ -42,7 +42,9 @@ class User(KayakoObject):
     lastvisit
     '''
 
-    __request_parameters__ = [
+    controller = '/Base/User'
+
+    __parameters__ = [
         'id',
         'fullname',
         'usergroupid',
@@ -59,14 +61,16 @@ class User(KayakoObject):
         'slaplanid',
         'slaplanexpiry',
         'userexpiry',
-    ]
-
-    __response_parameters__ = [
         'dateline',
         'lastvisit',
+        'sendwelcomeemail',
     ]
 
-    controller = '/Base/User'
+    __required_add_parameters__ = ['fullname', 'usergroupid', 'password', 'email']
+    __add_parameters__ = ['fullname', 'usergroupid', 'password', 'email', 'userorganizationid', 'salutation', 'designation', 'phone', 'isenabled', 'userrole', 'timezone', 'enabledst', 'slaplanid', 'slaplanexpiry', 'userexpiry', 'sendwelcomeemail']
+
+    __required_save_parameters__ = ['fullname']
+    __save_parameters__ = ['fullname', 'usergroupid', 'email', 'userorganizationid', 'salutation', 'designation', 'phone', 'isenabled', 'userrole', 'timezone', 'enabledst', 'slaplanid', 'slaplanexpiry', 'userexpiry']
 
     @classmethod
     def _parse_user(cls, user_tree):
@@ -75,7 +79,7 @@ class User(KayakoObject):
             fullname=cls._get_string(user_tree.find('fullname')),
             usergroupid=cls._get_int(user_tree.find('usergroupid')),
             email=[cls._get_string(email_tree.find('email')) for email_tree in user_tree.findall('email')],
-            userorganizationid=cls._get_int(user_tree.find('userorganizationid')),
+            userorganizationid=cls._get_int(user_tree.find('userorganizationid'), required=False),
             salutation=cls._get_string(user_tree.find('salutation')),
             designation=cls._get_string(user_tree.find('designation')),
             phone=cls._get_string(user_tree.find('phone')),
@@ -105,16 +109,19 @@ class User(KayakoObject):
     def get(cls, api, id):
         response = api._request('%s/%s/' % (cls.controller, id), 'GET')
         tree = etree.parse(response)
-        params = cls._parse_user(tree.find('user'))
+        node = tree.find('user')
+        if node is None:
+            return None
+        params = cls._parse_user(node)
         return User(api, **params)
 
     def add(self):
-        response = self._add(self.controller, 'fullname', 'usergroupid', 'password', 'email')
+        response = self._add(self.controller)
         tree = etree.parse(response)
         self.id = int(tree.find('user').find('id').text)
 
     def save(self):
-        self._save('%s/%s/' % (self.controller, self.id), 'fullname')
+        self._save('%s/%s/' % (self.controller, self.id))
 
     def delete(self):
         self._delete('%s/%s/' % (self.controller, self.id))
@@ -131,17 +138,20 @@ class UserGroup(KayakoObject):
     ismaster
     '''
 
-    __request_parameters__ = [
+    controller = '/Base/UserGroup'
+
+    __parameters__ = [
         'id',
         'title',
         'grouptype',
-    ]
-
-    __response_parameters__ = [
         'ismaster',
     ]
 
-    controller = '/Base/UserGroup'
+    __required_add_parameters__ = ['title', 'grouptype']
+    __add_parameters__ = ['title', 'grouptype']
+
+    __required_save_parameters__ = ['title']
+    __save_parameters__ = ['title']
 
     @classmethod
     def _parse_user_group(cls, user_group_tree):
@@ -163,16 +173,19 @@ class UserGroup(KayakoObject):
     def get(cls, api, id):
         response = api._request('%s/%s/' % (cls.controller, id), 'GET')
         tree = etree.parse(response)
-        params = cls._parse_user_group(tree.find('usergroup'))
+        node = tree.find('usergroup')
+        if node is None:
+            return None
+        params = cls._parse_user_group(node)
         return UserGroup(api, **params)
 
     def add(self):
-        response = self._add(self.controller, 'title', 'grouptype')
+        response = self._add(self.controller)
         tree = etree.parse(response)
         self.id = int(tree.find('usergroup').find('id').text)
 
     def save(self):
-        self._save('%s/%s/' % (self.controller, self.id), 'title')
+        self._save('%s/%s/' % (self.controller, self.id))
 
     def delete(self):
         self._delete('%s/%s/' % (self.controller, self.id))
@@ -198,7 +211,9 @@ class UserOrganization(KayakoObject):
     slaplanexpiry      The UNIX timestamp by which to ignore the SLA Plan, 0 = never expires
     '''
 
-    __request_parameters__ = [
+    controller = '/Base/UserOrganization'
+
+    __parameters__ = [
         'id',
         'name',
         'organizationtype',
@@ -212,14 +227,15 @@ class UserOrganization(KayakoObject):
         'website',
         'slaplanid',
         'slaplanexpiry',
-    ]
-
-    __response_parameters__ = [
         'dateline',
         'lastupdate',
     ]
 
-    controller = '/Base/UserOrganization'
+    __required_add_parameters__ = ['name', 'organizationtype']
+    __add_parameters__ = ['name', 'organizationtype', 'address', 'city', 'state', 'postalcode', 'country', 'phone', 'fax', 'website', 'slaplanid', 'slaplanexpiry']
+
+    __required_save_parameters__ = ['name']
+    __save_parameters__ = ['name', 'organizationtype', 'address', 'city', 'state', 'postalcode', 'country', 'phone', 'fax', 'website', 'slaplanid', 'slaplanexpiry']
 
     @classmethod
     def _parse_user_organization(cls, user_organization_tree):
@@ -252,16 +268,19 @@ class UserOrganization(KayakoObject):
     def get(cls, api, id):
         response = api._request('%s/%s/' % (cls.controller, id), 'GET')
         tree = etree.parse(response)
-        params = cls._parse_user_organization(tree.find('userorganization'))
+        node = tree.find('userorganization')
+        if node is None:
+            return node
+        params = cls._parse_user_organization(node)
         return UserOrganization(api, **params)
 
     def add(self):
-        response = self._add(self.controller, 'name', 'organizationtype')
+        response = self._add(self.controller)
         tree = etree.parse(response)
         self.id = int(tree.find('userorganization').find('id').text)
 
     def save(self):
-        self._save('%s/%s/' % (self.controller, self.id), 'name')
+        self._save('%s/%s/' % (self.controller, self.id))
 
     def delete(self):
         self._delete('%s/%s/' % (self.controller, self.id))

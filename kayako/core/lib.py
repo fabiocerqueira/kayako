@@ -50,51 +50,29 @@ FOREVER = _forever()
 class ParameterObject(object):
     '''
     An object used to build a dictionary around different parameter types.
-
-    __request_parameters__ = []
-        A list of parameters used to REQUEST an object (GET/POST/PUT/DELETE)
-
-    __response_parameters__ = []
-        A list of parameters used only when receiving object properties.
-        
-    request_parameters
-        This objects dictionary of request_parameters containing only set
-        parameters.
-        
-    response_parameters
-        This objects dictionary of response_parameters containing only set
-        parameters.
     '''
 
-    __request_parameters__ = None
-    ''' 
-    A list of parameters used to REQUEST an object (GET/POST/PUT/DELETE)
-    '''
-    __response_parameters__ = None
-    '''
-    A list of parameters used only when receiving object properties.
-    '''
+    __parameters__ = []
+    ''' Parameters that this ParameterObject can have. '''
 
     def __init__(self, **parameters):
         '''
         Creates this parameter object setting parameter values as given by
         keyword arguments.
         '''
-        if self.__request_parameters__:
-            unset_parameters = self.__request_parameters__[:]
-        else:
-            unset_parameters = []
-        if self.__response_parameters__:
-            unset_parameters.extend(self.__response_parameters__)
-        all_parameters = set(unset_parameters)
+        unset_parameters = self.__parameters__[:]
         for parameter, value in parameters.iteritems():
-            if parameter not in all_parameters:
+            if parameter not in self.__parameters__:
                 raise TypeError("'%s' is an invalid keyword argument for %s" % (parameter, self.__class__.__name__))
             else:
                 setattr(self, parameter, value)
                 unset_parameters.remove(parameter)
         for unset_parameter in unset_parameters:
             setattr(self, unset_parameter, UnsetParameter)
+
+    @property
+    def parameters(self):
+        return self._parameters_from_list(self.__parameters__)
 
     def _parameters_from_list(self, list):
         '''
@@ -107,23 +85,8 @@ class ParameterObject(object):
                 params[parameter] = attribute
         return params
 
-    @property
-    def request_parameters(self):
-        '''
-        Return a dictionary of this objects request parameters.
-        '''
-        return self._parameters_from_list(self.__request_parameters__)
-
-    @property
-    def response_parameters(self):
-        '''
-        Return a dictionary of this objects response parameters.
-        '''
-        return self._parameters_from_list(self.__response_parameters__)
-
     def __str__(self):
         return '<ParamterObject at %s>' % (hex(id(self)))
-
 
 class NodeParser(object):
     ''' Methods to parse text data from an lxml etree object. '''

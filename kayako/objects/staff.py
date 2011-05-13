@@ -38,7 +38,9 @@ class Staff(KayakoObject):
     enabledst      Toggle the enabling/disabling of automatic DST calculation 
     '''
 
-    __request_parameters__ = [
+    controller = '/Base/Staff'
+
+    __parameters__ = [
         'id',
         'firstname',
         'lastname',
@@ -55,7 +57,11 @@ class Staff(KayakoObject):
         'enabledst',
     ]
 
-    controller = '/Base/Staff'
+    __required_add_parameters__ = ['firstname', 'lastname', 'username', 'email', 'password', 'staffgroupid']
+    __add_parameters__ = ['firstname', 'lastname', 'username', 'email', 'password', 'staffgroupid', 'designation', 'mobilenumber', 'signature', 'isenabled', 'greeting', 'timezone', 'enabledst']
+
+    __required_save_parameters__ = ['firstname', 'lastname']
+    __save_parameters__ = ['firstname', 'lastname', 'username', 'email', 'password', 'staffgroupid', 'designation', 'mobilenumber', 'signature', 'isenabled', 'greeting', 'timezone', 'enabledst']
 
     @classmethod
     def _parse_staff(cls, staff_tree):
@@ -87,16 +93,19 @@ class Staff(KayakoObject):
     def get(cls, api, id):
         response = api._request('%s/%s/' % (cls.controller, id), 'GET')
         tree = etree.parse(response)
-        params = cls._parse_staff(tree.find('staff'))
+        node = tree.find('staff')
+        if node is None:
+            return None
+        params = cls._parse_staff(node)
         return Staff(api, **params)
 
     def add(self):
-        response = self._add(self.controller, 'firstname', 'lastname', 'username', 'email', 'password', 'staffgroupid')
+        response = self._add(self.controller)
         tree = etree.parse(response)
         self.id = int(tree.find('staff').find('id').text)
 
     def save(self):
-        self._save('%s/%s/' % (self.controller, self.id), 'firstname', 'lastname')
+        self._save('%s/%s/' % (self.controller, self.id))
 
     def delete(self):
         self._delete('%s/%s/' % (self.controller, self.id))
@@ -113,9 +122,17 @@ class StaffGroup(KayakoObject):
     isadmin  1 or 0, boolean controlling whether or not staff members assigned to this group are Administrators.
     '''
 
-    __request_parameters__ = ['id', 'title', 'isadmin', ]
-
     controller = '/Base/StaffGroup'
+
+
+    __parameters__ = ['id', 'title', 'isadmin']
+
+    __required_add_parameters__ = ['title', 'isadmin']
+    __add_parameters__ = ['title', 'isadmin']
+
+    __required_save_parameters__ = ['title']
+    __save_parameters__ = ['title', 'isadmin']
+
 
     @classmethod
     def _parse_staff_group(cls, staff_group_tree):
@@ -136,16 +153,19 @@ class StaffGroup(KayakoObject):
     def get(cls, api, id):
         response = api._request('%s/%s/' % (cls.controller, id), 'GET')
         tree = etree.parse(response)
-        params = cls._parse_staff_group(tree.find('staffgroup'))
+        node = tree.find('staffgroup')
+        if node is None:
+            return None
+        params = cls._parse_staff_group(node)
         return StaffGroup(api, **params)
 
     def add(self):
-        response = self._add(self.controller, 'title', 'isadmin')
+        response = self._add(self.controller)
         tree = etree.parse(response)
         self.id = int(tree.find('staffgroup').find('id').text)
 
     def save(self):
-        self._save('%s/%s/' % (self.controller, self.id), 'title')
+        self._save('%s/%s/' % (self.controller, self.id))
 
     def delete(self):
         self._delete('%s/%s/' % (self.controller, self.id))

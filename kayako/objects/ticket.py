@@ -4,19 +4,20 @@
 #
 # Distributed under the terms of the Lesser GNU General Public License (LGPL)
 #-----------------------------------------------------------------------------
+from urllib2 import URLError, HTTPError
 '''
 Created on May 10, 2011
 
 @author: evan
 '''
 
-import base64
-
-from lxml import etree
-
 from kayako.core.lib import UnsetParameter
 from kayako.core.object import KayakoObject
-from kayako.exception import KayakoRequestError
+from kayako.exception import KayakoRequestError, KayakoResponseError
+from lxml import etree
+import base64
+
+
 
 __all__ = [
     'Ticket',
@@ -46,7 +47,9 @@ class Ticket(KayakoObject):
     type             The ticket type: 'default' or 'phone' 
     '''
 
-    __request_parameters__ = [
+    controller = '/Tickets/Ticket'
+
+    __parameters__ = [
         'id',
         'subject',
         'fullname',
@@ -60,9 +63,6 @@ class Ticket(KayakoObject):
         'staffid',
         'ownerstaffid',
         'type',
-    ]
-
-    __response_parameters__ = [
         'flagtype',
         'displayid',
         'statusid',
@@ -92,7 +92,11 @@ class Ticket(KayakoObject):
         'posts',
     ]
 
-    controller = '/Tickets/Ticket'
+    __required_add_parameters__ = ['subject', 'fullname', 'email', 'contents', 'departmentid', 'ticketstatusid', 'ticketpriorityid', 'tickettypeid', ]
+    __add_parameters__ = ['subject', 'fullname', 'email', 'contents', 'departmentid', 'ticketstatusid', 'ticketpriorityid', 'tickettypeid', 'userid', 'staffid', 'ownerstaffid', 'type']
+
+    __required_save_parameters__ = []
+    __save_parameters__ = ['subject', 'fullname', 'email', 'departmentid', 'ticketstatusid', 'ticketpriorityid', 'ownerstaffid', 'userid', ]
 
     @classmethod
     def _parse_ticket(cls, api, ticket_tree):
@@ -124,7 +128,7 @@ class Ticket(KayakoObject):
             statusid=cls._get_int(ticket_tree.find('statusid')),
             typeid=cls._get_int(ticket_tree.find('typeid')),
             userorganization=cls._get_string(ticket_tree.find('userorganization')),
-            userorganizationid=cls._get_int(ticket_tree.find('userorganizationid')),
+            userorganizationid=cls._get_int(ticket_tree.find('userorganizationid'), required=False),
             ownerstaffname=cls._get_string(ticket_tree.find('ownerstaffname')),
             lastreplier=cls._get_string(ticket_tree.find('lastreplier')),
             creationtime=cls._get_date(ticket_tree.find('creationtime')),
@@ -177,9 +181,16 @@ class Ticket(KayakoObject):
 
     @classmethod
     def get(cls, api, id):
-        response = api._request('%s/%s/' % (cls.controller, id), 'GET')
+        try:
+            response = api._request('%s/%s/' % (cls.controller, id), 'GET')
+        except KayakoResponseError, error:
+            if len(error.args) and isinstance(error.args[0], (URLError, HTTPError)) and error.args[0].getcode() == 404:
+                return None
         tree = etree.parse(response)
-        params = cls._parse_ticket(api, tree.find('ticket'))
+        node = tree.find('ticket')
+        if node is None:
+            return None
+        params = cls._parse_ticket(api, node)
         return Ticket(api, **params)
 
     def add(self):
@@ -205,8 +216,8 @@ class Ticket(KayakoObject):
         if self.id is not UnsetParameter:
             raise KayakoRequestError('Cannot add a pre-existing %s. Use save instead. (id: %s)' % (self.__class__.__name__, self.id))
 
-        parameters = self._parameters_from_list(['subject', 'fullname', 'email', 'contents', 'departmentid', 'ticketstatusid', 'ticketpriorityid', 'tickettypeid', 'userid', 'staffid', 'ownerstaffid', 'type'])
-        for required_parameter in ['subject', 'fullname', 'email', 'contents', 'departmentid', 'ticketstatusid', 'ticketpriorityid', 'tickettypeid']:
+        parameters = self.add_parameters
+        for required_parameter in self.__required_add_parameters__:
             if required_parameter not in parameters:
                 raise KayakoRequestError('Cannot add %s: Missing required field: %s.' % (self.__class__.__name__, required_parameter))
 
@@ -232,11 +243,7 @@ class Ticket(KayakoObject):
             ownerstaffid     The Owner Staff ID, if you want to set an Owner for this ticket
             userid           The User ID, if you want to change the user for this ticket 
         '''
-
-        if self.id is UnsetParameter:
-            raise KayakoRequestError('Cannot save a non-existent %s. Use add instead.' % self.__class__.__name__)
-        parameters = self._parameters_from_list(['subject', 'fullname', 'email', 'departmentid', 'ticketstatusid', 'ticketpriorityid', 'tickettypeid', 'ownerstaffid', 'userid'])
-        self.api._request('%s/%s/' % (self.controller, self.id), 'PUT', **parameters)
+        self._save('%s/%s/' % (self.controller, self.id))
 
     def delete(self):
         self._delete('%s/%s/' % (self.controller, self.id))
@@ -257,7 +264,9 @@ class TicketAttachment(KayakoObject):
     dateline
     '''
 
-    __request_parameters__ = [
+    controller = '/Tickets/TicketAttachment'
+
+    __parameters__ = [
         'id',
         'ticketid',
         'ticketpostid',
@@ -268,7 +277,14 @@ class TicketAttachment(KayakoObject):
         'dateline',
     ]
 
-    controller = '/Tickets/TicketAttachment'
+    __required_add_parameters__ = ['ticketid', 'ticketpostid', 'filename', 'contents']
+    __add_parameters__ = ['ticketid', 'ticketpostid', 'filename', 'contents']
+
+    __required_save_parameters__ = []
+    ''' Save not available for TicketAttachment. '''
+    __save_parameters__ = []
+    ''' Save not available for TicketAttachment. '''
+
 
     @classmethod
     def _parse_ticket_attachment(cls, ticket_attachment_tree):
@@ -298,9 +314,16 @@ class TicketAttachment(KayakoObject):
 
     @classmethod
     def get(cls, api, ticketid, attachmentid):
-        response = api._request('%s/%s/%s/' % (cls.controller, ticketid, attachmentid), 'GET')
+        try:
+            response = api._request('%s/%s/%s/' % (cls.controller, ticketid, attachmentid), 'GET')
+        except KayakoResponseError, error:
+            if len(error.args) and isinstance(error.args[0], (URLError, HTTPError)) and error.args[0].getcode() == 404:
+                return None
         tree = etree.parse(response)
-        params = cls._parse_ticket_attachment(tree.find('attachment'))
+        node = tree.find('attachment')
+        if node is None:
+            return None
+        params = cls._parse_ticket_attachment(node)
         return TicketAttachment(api, **params)
 
     def add(self):
@@ -313,15 +336,7 @@ class TicketAttachment(KayakoObject):
             filename     The file name for the attachment
             contents     The BASE64 encoded attachment contents 
         '''
-        if self.id is not UnsetParameter:
-            raise KayakoRequestError('Cannot add a pre-existing %s. Use save instead. (id: %s)' % (self.__class__.__name__, self.id))
-
-        parameters = self._parameters_from_list(['ticketid', 'ticketpostid', 'filename', 'contents'])
-        for required_parameter in ['ticketid', 'ticketpostid', 'filename', 'contents']:
-            if required_parameter not in parameters:
-                raise KayakoRequestError('Cannot add %s: Missing required field: %s.' % (self.__class__.__name__, required_parameter))
-
-        response = self.api._request(self.controller, 'POST', **parameters)
+        response = self._add(self.controller)
         tree = etree.parse(response)
         self.id = int(tree.find('attachment').find('id').text)
 
@@ -360,7 +375,9 @@ class TicketNote(KayakoObject):
     notecolor    The Note Color, for more information see note colors (http://wiki.kayako.com/display/DEV/Mobile+-+Constants)
     '''
 
-    __request_parameters__ = [
+    controller = '/Tickets/TicketNote'
+
+    __parameters__ = [
         'id',
         'ticketid',
         'contents',
@@ -368,22 +385,22 @@ class TicketNote(KayakoObject):
         'fullname',
         'forstaffid',
         'notecolor',
-    ]
-
-    __response_parameters__ = [
         'type',
         'creatorstaffid',
         'creatorstaffname',
         'creationdate',
     ]
 
-    controller = '/Tickets/TicketNote'
+    __required_add_parameters__ = ['ticketid', 'contents']
+    __add_parameters__ = ['ticketid', 'contents', 'staffid', 'fullname', 'forstaffid', 'notecolor']
+
+    __required_save_parameters__ = []
+    ''' Save not available for TicketNote. '''
+    __save_parameters__ = []
+    ''' Save not available for TicketNote. '''
 
     @classmethod
     def _parse_ticket_note(cls, ticket_note_tree, ticketid):
-
-        # type="ticket" notecolor="1" creatorstaffid="1" forstaffid="0" creatorstaffname="Varun Shoor" creationdate="1297842447"
-
         params = dict(
             ticketid=ticketid,
             contents=ticket_note_tree.text,
@@ -412,7 +429,10 @@ class TicketNote(KayakoObject):
 #    def get(cls, api, ticketid, id):
 #        response = api._request('%s/%s/%s/' % (cls.controller, ticketid, id), 'GET')
 #        tree = etree.parse(response)
-#        params = cls._parse_ticket_note(tree.find('note'), ticketid)
+#        node = tree.find('note')
+#        if node is None:
+#            return None
+#        params = cls._parse_ticket_note(node, ticketid)
 #        return TicketNote(api, **params)
 
     def add(self):
@@ -432,9 +452,9 @@ class TicketNote(KayakoObject):
         if self.id is not UnsetParameter:
             raise KayakoRequestError('Cannot add a pre-existing %s. Use save instead. (id: %s)' % (self.__class__.__name__, self.id))
 
-        parameters = self._parameters_from_list(['ticketid', 'contents', 'staffid', 'fullname', 'forstaffid', 'notecolor'])
+        parameters = self.add_parameters
 
-        for required_parameter in ['ticketid', 'contents']:
+        for required_parameter in self.__required_add_parameters__:
             if required_parameter not in parameters:
                 raise KayakoRequestError('Cannot add %s: Missing required field: %s.' % (self.__class__.__name__, required_parameter))
 
@@ -476,16 +496,13 @@ class TicketPost(KayakoObject):
     issurveycomment
     '''
 
-    __request_parameters__ = [
+    __parameters__ = [
         'id',
         'ticketid',
         'subject',
         'contents',
         'userid',
         'staffid',
-    ]
-
-    __response_parameters__ = [
         'dateline',
         'fullname',
         'email',
@@ -498,6 +515,14 @@ class TicketPost(KayakoObject):
         'isemailed',
         'issurveycomment',
     ]
+
+    __required_add_parameters__ = ['ticketid', 'subject', 'contents']
+    __add_parameters__ = ['ticketid', 'subject', 'contents', 'userid', 'staffid']
+
+    __required_save_parameters__ = []
+    ''' Save not available for TicketNote. '''
+    __save_parameters__ = []
+    ''' Save not available for TicketNote. '''
 
     controller = '/Tickets/TicketPost'
 
@@ -538,9 +563,16 @@ class TicketPost(KayakoObject):
 
     @classmethod
     def get(cls, api, ticketid, id):
-        response = api._request('%s/%s/%s/' % (cls.controller, ticketid, id), 'GET')
+        try:
+            response = api._request('%s/%s/%s/' % (cls.controller, ticketid, id), 'GET')
+        except KayakoResponseError, error:
+            if len(error.args) and isinstance(error.args[0], (URLError, HTTPError)) and error.args[0].getcode() == 404:
+                return None
         tree = etree.parse(response)
-        params = cls._parse_ticket_post(tree.find('post'), ticketid)
+        node = tree.find('post')
+        if node is None:
+            return None
+        params = cls._parse_ticket_post(node, ticketid)
         return TicketPost(api, **params)
 
     def add(self):
@@ -558,9 +590,9 @@ class TicketPost(KayakoObject):
         if self.id is not UnsetParameter:
             raise KayakoRequestError('Cannot add a pre-existing %s. Use save instead. (id: %s)' % (self.__class__.__name__, self.id))
 
-        parameters = self._parameters_from_list(['ticketid', 'subject', 'contents', 'userid', 'staffid'])
+        parameters = self.add_parameters
 
-        for required_parameter in ['ticketid', 'subject', 'contents']:
+        for required_parameter in self.__required_add_parameters__:
             if required_parameter not in parameters:
                 raise KayakoRequestError('Cannot add %s: Missing required field: %s.' % (self.__class__.__name__, required_parameter))
 
@@ -595,7 +627,9 @@ class TicketPriority(KayakoObject):
 
     '''
 
-    __response_parameters__ = [
+    controller = '/Tickets/TicketPriority'
+
+    __parameters__ = [
         'id',
         'title',
         'displayorder',
@@ -607,7 +641,15 @@ class TicketPriority(KayakoObject):
         'usergroupid',
     ]
 
-    controller = '/Tickets/TicketPriority'
+    __required_add_parameters__ = []
+    ''' Add not available for TicketPriority. '''
+    __add_parameters__ = []
+    ''' Add not available for TicketPriority. '''
+
+    __required_save_parameters__ = []
+    ''' Save not available for TicketPriority. '''
+    __save_parameters__ = []
+    ''' Save not available for TicketPriority. '''
 
     @classmethod
     def _parse_ticket_priority(cls, ticket_priority_tree):
@@ -635,6 +677,9 @@ class TicketPriority(KayakoObject):
     def get(cls, api, id):
         response = api._request('%s/%s/' % (cls.controller, id), 'GET')
         tree = etree.parse(response)
+        node = tree.find('ticketpriority')
+        if node is None:
+            return None
         params = cls._parse_ticket_priority(tree.find('ticketpriority'))
         return TicketPriority(api, **params)
 
@@ -662,7 +707,9 @@ class TicketStatus(KayakoObject):
 
     '''
 
-    __response_parameters__ = [
+    controller = '/Tickets/TicketStatus'
+
+    __parameters__ = [
         'id',
         'title',
         'displayorder',
@@ -679,7 +726,15 @@ class TicketStatus(KayakoObject):
         'staffvisibilitycustom',
     ]
 
-    controller = '/Tickets/TicketStatus'
+    __required_add_parameters__ = []
+    ''' Add not available for TicketStatus. '''
+    __add_parameters__ = []
+    ''' Add not available for TicketStatus. '''
+
+    __required_save_parameters__ = []
+    ''' Save not available for TicketStatus. '''
+    __save_parameters__ = []
+    ''' Save not available for TicketStatus. '''
 
     @classmethod
     def _parse_ticket_status(cls, ticket_status_tree):
@@ -712,7 +767,10 @@ class TicketStatus(KayakoObject):
     def get(cls, api, id):
         response = api._request('%s/%s/' % (cls.controller, id), 'GET')
         tree = etree.parse(response)
-        params = cls._parse_ticket_status(tree.find('ticketstatus'))
+        node = tree.find('ticketstatus')
+        if node is None:
+            return None
+        params = cls._parse_ticket_status(node)
         return TicketStatus(api, **params)
 
     def __str__(self):
@@ -732,7 +790,9 @@ class TicketType(KayakoObject):
 
     '''
 
-    __response_parameters__ = [
+    controller = '/Tickets/TicketType'
+
+    __parameters__ = [
         'id',
         'title',
         'displayorder',
@@ -742,7 +802,15 @@ class TicketType(KayakoObject):
         'uservisibilitycustom',
     ]
 
-    controller = '/Tickets/TicketType'
+    __required_add_parameters__ = []
+    ''' Add not available for TicketType. '''
+    __add_parameters__ = []
+    ''' Add not available for TicketType. '''
+
+    __required_save_parameters__ = []
+    ''' Save not available for TicketType. '''
+    __save_parameters__ = []
+    ''' Save not available for TicketType. '''
 
     @classmethod
     def _parse_ticket_type(cls, ticket_type_tree):
@@ -768,7 +836,10 @@ class TicketType(KayakoObject):
     def get(cls, api, id):
         response = api._request('%s/%s/' % (cls.controller, id), 'GET')
         tree = etree.parse(response)
-        params = cls._parse_ticket_type(tree.find('tickettype'))
+        node = tree.find('tickettype')
+        if node is None:
+            return None
+        params = cls._parse_ticket_type(node)
         return TicketType(api, **params)
 
     def __str__(self):

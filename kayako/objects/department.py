@@ -28,12 +28,19 @@ class Department(KayakoObject):
     displayorder          A positive integer that the helpdesk will use to sort departments when displaying them (ascending).
     parentdepartmentid    A positive integer of the parent department for this department.
     uservisibilitycustom  1 or 0 boolean that controls whether or not to restrict visibility of this department to particular user groups (see usergroupid[]).
-    usergroupid[]         An array of positive integers identifying the user groups to be assigned to this department. 
+    usergroupid[]         A list of usergroup id's identifying the user groups to be assigned to this department. 
     '''
 
-    __request_parameters__ = ['id', 'title', 'type', 'module', 'displayorder', 'parentdepartmentid', 'uservisibilitycustom', 'usergroups']
-
     controller = '/Base/Department'
+
+    __parameters__ = ['id', 'title', 'type', 'module', 'displayorder', 'parentdepartmentid', 'uservisibilitycustom', 'usergroupid']
+
+    __required_add_parameters__ = ['title', 'module', 'type']
+    __add_parameters__ = ['title', 'module', 'type', 'displayorder', 'parentdepartmentid', 'uservisibilitycustom', 'usergroupid']
+
+    __required_save_parameters__ = ['title']
+    __save_parameters__ = ['title', 'type', 'displayorder', 'parentdepartmentid', 'uservisibilitycustom', 'usergroupid']
+
 
     @classmethod
     def _parse_department(cls, department_tree):
@@ -52,7 +59,7 @@ class Department(KayakoObject):
             displayorder=cls._get_int(department_tree.find('displayorder')),
             parentdepartmentid=cls._get_int(department_tree.find('parentdepartmentid'), required=False),
             uservisibilitycustom=cls._get_boolean(department_tree.find('uservisibilitycustom')),
-            usergroups=usergroups,
+            usergroupid=usergroups,
         )
         return params
 
@@ -66,16 +73,19 @@ class Department(KayakoObject):
     def get(cls, api, id):
         response = api._request('%s/%s/' % (cls.controller, id), 'GET')
         tree = etree.parse(response)
-        params = cls._parse_department(tree.find('department'))
+        node = tree.find('department')
+        if node is None:
+            return None
+        params = cls._parse_department(node)
         return Department(api, **params)
 
     def add(self):
-        response = self._add(self.controller, 'title', 'module', 'type')
+        response = self._add(self.controller)
         tree = etree.parse(response)
         self.id = int(tree.find('department').find('id').text)
 
     def save(self):
-        self._save('%s/%s/' % (self.controller, self.id), 'title')
+        self._save('%s/%s/' % (self.controller, self.id))
 
     def delete(self):
         self._delete('%s/%s/' % (self.controller, self.id))

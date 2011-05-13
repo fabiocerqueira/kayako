@@ -63,9 +63,42 @@ class KayakoObject(ParameterObject, KayakoRequestParser):
     api = None
     controller = None
 
+    __required_add_parameters__ = []
+    ''' Parameters required to add this object. '''
+    __add_parameters__ = []
+    ''' Parameters sent when adding this object. '''
+
+    __required_save_parameters__ = []
+    ''' Parameters required to save this object. '''
+    __save_parameters__ = []
+    ''' Parameters sent when saving this object. '''
+
     def __init__(self, api, **parameters):
         ParameterObject.__init__(self, **parameters)
         self.api = api
+
+    ## ParameterObject
+
+    @property
+    def add_parameters(self):
+        '''
+        Return a dictionary of this objects add parameters.
+        '''
+        return self._parameters_from_list(self.__add_parameters__)
+
+    @property
+    def save_parameters(self):
+        '''
+        Return a dictionary of this objects save parameters.
+        '''
+        return self._parameters_from_list(self.__save_parameters__)
+
+    @property
+    def parameters(self):
+        '''
+        Return a dictionary of this objects save parameters.
+        '''
+        return self._parameters_from_list(self.__parameters__)
 
     ## Persistence Layer
 
@@ -75,20 +108,20 @@ class KayakoObject(ParameterObject, KayakoRequestParser):
         raise KayakoMethodNotImplementedError('GET ALL %s is not implemented for this object.' % cls.__name__)
 
     @classmethod
-    def get(cls, api, id):
+    def get(cls, api, *args):
         ''' Get an instance of this object by ID '''
         raise KayakoMethodNotImplementedError('GET %s not implemented (id:%s)' % (cls.__name__, id))
 
-    def _add(self, controller, *required_parameters):
+    def _add(self, controller):
         '''
-        Refactored method to check required parameters before adding. Also checks
-        that 'id,' if present, is an UnsetParameter.
+        Refactored method to check required parameters before adding. 
+        Also checks self.id is an UnsetParameter.
         Returns the response returned by the API call.
         '''
-        parameters = self.request_parameters
-        if 'id' in parameters:
+        if self.id is not UnsetParameter:
             raise KayakoRequestError('Cannot add a pre-existing %s. Use save instead. (id: %s)' % (self.__class__.__name__, self.id))
-        for required_parameter in required_parameters:
+        parameters = self.add_parameters
+        for required_parameter in self.__required_add_parameters__:
             if required_parameter not in parameters:
                 raise KayakoRequestError('Cannot add %s: Missing required field: %s.' % (self.__class__.__name__, required_parameter))
         return self.api._request(controller, 'POST', **parameters)
@@ -103,10 +136,10 @@ class KayakoObject(ParameterObject, KayakoRequestParser):
         that 'id,' if present, is an UnsetParameter.
         Returns the response returned by the API call.
         '''
-        parameters = self.request_parameters
-        if 'id' not in parameters:
+        if self.id is None or self.id is UnsetParameter:
             raise KayakoRequestError('Cannot save a non-existent %s. Use add instead.' % self.__class__.__name__)
-        for required_parameter in required_parameters:
+        parameters = self.save_parameters
+        for required_parameter in self.__required_save_parameters__:
             if required_parameter not in parameters:
                 raise KayakoRequestError('Cannot save %s: Missing required field: %s. (id: %s)' % (self.__class__.__name__, required_parameter, self.id))
         return self.api._request(controller, 'PUT', **parameters)
@@ -132,12 +165,6 @@ class KayakoObject(ParameterObject, KayakoRequestParser):
         return '<%s at %s>' % (self.__class__.__name__, hex(id(self)))
 
     def __repr__(self):
-        if self.__request_parameters__:
-            params = self.__request_parameters__[:]
-        else:
-            params = []
-        if self.__response_parameters__:
-            params.extend(self.__response_parameters__)
-        all_parameters = self._parameters_from_list(set(params))
-        return '%s(%s, **%s)' % (self.__class__.__name__, self.api, all_parameters)
+        params = self.parameters
+        return '%s(%s%s)' % (self.__class__.__name__, self.api, ', **%s' % params if params else '')
 

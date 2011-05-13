@@ -14,6 +14,107 @@ from kayako.test import KayakoAPITest
 
 class TestTicketPost(KayakoAPITest):
 
+    def test_get_nonexistant(self):
+        from kayako.objects import Department, Ticket, TicketPost
+
+        api = self.api
+
+        depts = api.get_all(Department)
+        for dept in depts:
+            if dept.module == 'tickets':
+                break
+
+        ticket = api.create(Ticket)
+        ticket.subject = 'DELETE_ME'
+        ticket.fullname = 'Unit Test'
+        ticket.email = 'test@example.com'
+        ticket.contents = 'test'
+        ticket.departmentid = dept.id
+        ticket.ticketstatusid = 1
+        ticket.ticketpriorityid = 1
+        ticket.tickettypeid = 1
+        ticket.userid = 1
+        ticket.ownerstaffid = 1
+        ticket.type = 'default'
+        ticket.add()
+
+        obj = api.get(TicketPost, ticket.id, 'abc123')
+
+        ticket.delete()
+
+        assert obj is None
+
+    def test_add_get_userid(self):
+        from kayako.objects import Department, Ticket, TicketPost
+        api = self.api
+
+        depts = api.get_all(Department)
+        for dept in depts:
+            if dept.module == 'tickets':
+                break
+
+        ticket = api.create(Ticket)
+        ticket.subject = 'DELETE_ME'
+        ticket.fullname = 'Unit Test'
+        ticket.email = 'test@example.com'
+        ticket.contents = 'test'
+        ticket.departmentid = dept.id
+        ticket.ticketstatusid = 1
+        ticket.ticketpriorityid = 1
+        ticket.tickettypeid = 1
+        ticket.userid = 1
+        ticket.ownerstaffid = 1
+        ticket.type = 'default'
+        ticket.add()
+
+        ticket_post = api.create(TicketPost)
+        ticket_post.ticketid = ticket.id
+        ticket_post.subject = 'test_post'
+        ticket_post.contents = 'testing a post'
+        ticket_post.userid = 1
+        ticket_post.add()
+
+        obj2 = api.get(TicketPost, ticket.id, ticket_post.id)
+
+        ticket.delete()
+        assert obj2 is not None
+
+    def test_add_get_staffid(self):
+        from kayako.objects import Department, Ticket, TicketPost
+        api = self.api
+
+        depts = api.get_all(Department)
+        for dept in depts:
+            if dept.module == 'tickets':
+                break
+
+        ticket = api.create(Ticket)
+        ticket.subject = 'DELETE_ME'
+        ticket.fullname = 'Unit Test'
+        ticket.email = 'test@example.com'
+        ticket.contents = 'test'
+        ticket.departmentid = dept.id
+        ticket.ticketstatusid = 1
+        ticket.ticketpriorityid = 1
+        ticket.tickettypeid = 1
+        ticket.userid = 1
+        ticket.ownerstaffid = 1
+        ticket.type = 'default'
+        ticket.add()
+
+        ticket_post = api.create(TicketPost)
+        ticket_post.ticketid = ticket.id
+        ticket_post.subject = 'test_post'
+        ticket_post.contents = 'testing a post'
+        ticket_post.staffid = 1
+        ticket_post.add()
+
+        obj2 = api.get(TicketPost, ticket.id, ticket_post.id)
+
+        ticket.delete()
+        assert obj2 is not None
+
+
     def test_get_all(self):
         from kayako.objects import Department, Ticket, TicketPost
 

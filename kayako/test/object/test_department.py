@@ -13,6 +13,28 @@ from kayako.test import KayakoAPITest
 
 class TestDepartment(KayakoAPITest):
 
+    def test_get_nonexistant(self):
+        from kayako.objects import Department
+        d = self.api.get(Department, '123123')
+        assert d is None
+
+    def test_add_get_bare(self):
+        from kayako.objects import Department
+        d = self.api.create(Department, title='test', module='tickets', type='private')
+        d.add()
+        obj2 = self.api.get(Department, d.id)
+        d.delete()
+        assert obj2 is not None
+
+    def test_add_get_full(self):
+        from kayako.objects import Department
+        d = self.api.create(Department, title='test', module='tickets', type='private',
+                            displayorder=15, parentdepartmentid=2, uservisibilitycustom=0, usergroupid=[1, 2])
+        d.add()
+        obj2 = self.api.get(Department, d.id)
+        d.delete()
+        assert obj2 is not None
+
     def test_get_department(self):
         from kayako.objects import Department
         d = self.api.get(Department, 1)

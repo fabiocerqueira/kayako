@@ -13,6 +13,29 @@ from kayako.test import KayakoAPITest
 
 class TestUser(KayakoAPITest):
 
+    def test_get_nonexistant(self):
+        from kayako.objects import User
+        obj = self.api.get(User, 'abc123')
+        assert obj is None
+
+    def test_add_get_bare(self):
+        from kayako.objects import User
+        user = self.api.create(User, fullname='DELETE ME', usergroupid=2, password='deleteme', email='deleteme@example.com')
+        user.add()
+        user2 = self.api.get(User, user.id)
+        user.delete()
+        assert user2 is not None
+
+    def test_add_get_full(self):
+        from datetime import datetime
+        from kayako.objects import User
+        user = self.api.create(User, fullname='DELETE ME', usergroupid=2, password='deleteme', email='deleteme@example.com',
+                               userorganizationid=1, salutation='Mr.', designation='CEO', phone='123-456-7890', isenabled=False, userrole='user', timezone='MST', enabledst=True, slaplanid=1, slaplanexpiry=datetime.now(), sendwelcomeemail=False)
+        user.add()
+        user2 = self.api.get(User, user.id)
+        user.delete()
+        assert user2 is not None
+
     def test_get_all(self):
         from kayako.objects import User
         result = self.api.get_all(User)
@@ -115,6 +138,20 @@ class TestUser(KayakoAPITest):
 
 class TestUserGroup(KayakoAPITest):
 
+    def test_get_nonexistant(self):
+        from kayako.objects import UserGroup
+        obj = self.api.get(UserGroup, '12345')
+        print obj
+        assert obj is None
+
+    def test_add_get(self):
+        from kayako.objects import UserGroup
+        obj = self.api.create(UserGroup, title='DELETE ME', grouptype='registered')
+        obj.add()
+        obj2 = self.api.get(UserGroup, obj.id)
+        obj.delete()
+        assert obj2 is not None
+
     def test_get_all(self):
         from kayako.objects import UserGroup
         result = self.api.get_all(UserGroup)
@@ -173,6 +210,29 @@ class TestUserGroup(KayakoAPITest):
         self.assertRaises(KayakoRequestError, usergroup.delete)
 
 class TestUserOrganization(KayakoAPITest):
+
+    def test_get_nonexistant(self):
+        from kayako.objects import UserOrganization
+        obj = self.api.get(UserOrganization, '123123')
+        assert obj is None
+
+    def test_add_get_bare(self):
+        from kayako.objects import UserOrganization
+        obj = self.api.create(UserOrganization, name='DELETE ME', organizationtype='restricted')
+        obj.add()
+        obj2 = self.api.get(UserOrganization, obj.id)
+        obj.delete()
+        assert obj2 is not None
+
+    def test_add_get_full(self):
+        from datetime import datetime
+        from kayako.objects import UserOrganization
+        obj = self.api.create(UserOrganization, name='DELETE ME', organizationtype='restricted',
+                              address='23423 E', city='Salt Lake City', state='Utah', postalcode=84121, country='USA', phone='123-456-7890', fax='098-765-4321', website='http://example.com', slaplanid=1, slaplanexpiry=datetime.now())
+        obj.add()
+        obj2 = self.api.get(UserOrganization, obj.id)
+        obj.delete()
+        assert obj2 is not None
 
     def test_get_all(self):
         from kayako.objects import UserOrganization
