@@ -40,6 +40,7 @@ class User(KayakoObject):
     userexpiry            The User Expiry, 0 = never expires 
     dateline             
     lastvisit
+    sendwelcomeemail
     '''
 
     controller = '/Base/User'
@@ -74,11 +75,17 @@ class User(KayakoObject):
 
     @classmethod
     def _parse_user(cls, user_tree):
+        emails = []
+        emails_tree = user_tree.find('emails')
+        if emails_tree is not None:
+            emails = [cls._get_string(email_node) for email_node in emails_tree.findall('email')]
+        else:
+            emails = [cls._get_string(email_node) for email_node in user_tree.findall('email')]
         params = dict(
             id=cls._get_int(user_tree.find('id')),
             fullname=cls._get_string(user_tree.find('fullname')),
             usergroupid=cls._get_int(user_tree.find('usergroupid')),
-            email=[cls._get_string(email_tree.find('email')) for email_tree in user_tree.findall('email')],
+            email=emails,
             userorganizationid=cls._get_int(user_tree.find('userorganizationid'), required=False),
             salutation=cls._get_string(user_tree.find('salutation')),
             designation=cls._get_string(user_tree.find('designation')),
