@@ -22,7 +22,7 @@ from datetime import datetime
 from kayako.exception import KayakoRequestError, KayakoResponseError, KayakoInitializationError
 from kayako.core.lib import FOREVER
 
-class KayakoAPI:
+class KayakoAPI(object):
     ''' 
     Python API wrapper for Kayako 4.01.204
     --------------------------------------
