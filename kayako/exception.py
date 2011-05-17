@@ -11,7 +11,16 @@ Created on May 5, 2011
 '''
 
 class KayakoError(StandardError):
-    pass
+
+    @property
+    def read(self):
+        if self.args:
+            for arg in self.args:
+                if hasattr(arg, 'read'):
+                    if callable(arg.read):
+                        return arg.read()
+                    else:
+                        return arg.read
 
 class KayakoInitializationError(KayakoError):
     pass

@@ -16,9 +16,9 @@ import unittest
 
 class KayakoAPITest(unittest.TestCase):
 
-    API_URL = 'https://support.employeerewards.com/api/index.php'
-    API_KEY = 'a7f9507e-6538-99c4-29e3-852614ce3385'
-    SECRET_KEY = 'NjAxYWMyZGUtMmYzNy1kYjA0LWM1NDktMWU4Yzg3MzdjYWFlODFiYjMxNmMtZmViZS1iMWM0LTY5NmYtNzE0YmQzMGMyNmRk'
+    API_URL = ''
+    API_KEY = ''
+    SECRET_KEY = ''
 
     @property
     def api(self):
