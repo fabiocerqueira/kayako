@@ -82,6 +82,7 @@ class Department(KayakoObject):
     def add(self):
         response = self._add(self.controller)
         tree = etree.parse(response)
+        print etree.tostring(tree)
         self.id = int(tree.find('department').find('id').text)
 
     def save(self):

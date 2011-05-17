@@ -9,9 +9,20 @@ Created on May 9, 2011
 
 @author: evan
 '''
-from kayako.test import KayakoAPITest
+from kayako.tests import KayakoAPITest
 
 class TestTicketPriority(KayakoAPITest):
+
+    def test_filter(self):
+        from kayako.objects import TicketPriority
+        result = self.api.filter(TicketPriority, title='Urgent')
+        assert len(result) == 1
+        assert result[0].title == 'Urgent'
+
+    def test_first(self):
+        from kayako.objects import TicketPriority
+        result = self.api.first(TicketPriority, title='Urgent')
+        assert result.title == 'Urgent'
 
     def test_get_all(self):
         from kayako.objects import TicketPriority

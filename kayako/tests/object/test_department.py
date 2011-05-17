@@ -9,7 +9,7 @@ Created on May 9, 2011
 
 @author: evan
 '''
-from kayako.test import KayakoAPITest
+from kayako.tests import KayakoAPITest
 
 class TestDepartment(KayakoAPITest):
 
@@ -28,8 +28,9 @@ class TestDepartment(KayakoAPITest):
 
     def test_add_get_full(self):
         from kayako.objects import Department
+        parent = self.api.first(Department, parentdepartmentid=0)
         d = self.api.create(Department, title='test', module='tickets', type='private',
-                            displayorder=15, parentdepartmentid=2, uservisibilitycustom=0, usergroupid=[1, 2])
+                            displayorder=15, parentdepartmentid=parent.id, uservisibilitycustom=0, usergroupid=[1, 2])
         d.add()
         obj2 = self.api.get(Department, d.id)
         d.delete()

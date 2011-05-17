@@ -9,7 +9,7 @@ Created on May 9, 2011
 
 @author: evan
 '''
-from kayako.test import KayakoAPITest
+from kayako.tests import KayakoAPITest
 class TestStaff(KayakoAPITest):
 
     def test_add_get_nonexistant(self):

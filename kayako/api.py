@@ -24,24 +24,24 @@ from kayako.core.lib import FOREVER
 
 class KayakoAPI:
     ''' 
-    API Wrapper for Kayako. 
-    -----------------------
-    
+    Python API wrapper for Kayako 4.01.204
+    --------------------------------------
+        
     **Usage:**
-
+    
     ::
     
-        from kayako import KayakoAPI, User, Ticket, Department, UnsetParameter
-        api = KayakoAPI('http://kayako.foo.com/api/index.php', 's8v092-2lksd-9cso-c2', 'somesecret')
-        departments = api.get_all(Department)
-        for department in departments:
-            # Print every ticket in every department
-            tickets = api.get_all(Ticket, department.id)
-            for ticket in tickets:
-                print department, ticket
-        >>> <Department...> <Ticket...>
-        >>> <Department...> <Ticket...>
-        >>> <Department...> <Ticket...>
+        >>> from kayako import KayakoAPI, User, Ticket, Department, UnsetParameter
+        >>> api = KayakoAPI('http://kayako.foo.com/api/index.php', 's8v092-2lksd-9cso-c2', 'somesecret')
+        >>> departments = api.get_all(Department)
+        >>> for department in departments:
+        >>>     # Print every ticket in every department
+        >>>     tickets = api.get_all(Ticket, department.id)
+        >>>     for ticket in tickets:
+        >>>         print department, ticket
+        <Department...> <Ticket...>
+        <Department...> <Ticket...>
+        <Department...> <Ticket...>
         
     **Add an object**
     
@@ -62,16 +62,17 @@ class KayakoAPI:
     
     ``api.create(Object, *args, **kwargs)``
     
-        Create a new KayakoObject of the type given, passing in args and kwargs.
+        Create and return a new KayakoObject of the type given passing in args and kwargs.
         
     ``api.get_all(Object, *args, **kwargs)``
     
         *Get all Kayako Objects of the given type.*
         *In most cases, all items are returned.*
         
-        e.x.::
-            api.get_all(Department)
-            >>> [<Department....>, ....]
+        e.x. ::
+        
+            >>> api.get_all(Department)
+            [<Department....>, ....]
     
         *Special Cases:*
         
@@ -89,13 +90,30 @@ class KayakoAPI:
             ``api.get_all(TicketPost, ticketid)``
                 Return all TicketPosts for a Ticket with the given ID.
     
+    ``api.filter(Object, args=(), kwargs={}, **filter)``
+    
+        Gets all KayakoObjects matching a filter.
+            
+            e.x.
+                >>> api.filter(Department, args=(2), module='tickets')
+                [<Department module='tickets'...>, <Department module='tickets'...>, ...]
+                
+    ``api.first(Object, args=(), kwargs={}, **filter)``
+    
+        Returns the first KayakoObject found matching a given filter.
+            
+            e.x.
+                >>> api.filter(Department, args=(2), module='tickets')
+                <Department module='tickets'>
+    
     ``api.get(Object, *args)``
     
         *Get a Kayako Object of the given type by ID.*
         
-        e.x.
-            ``api.get(User, 112359)``
-            ``>>> <User (112359)....>``
+        e.x. ::
+        
+            >>> api.get(User, 112359)
+            <User (112359)....>
         
         *Special Cases:*
             
@@ -306,8 +324,8 @@ class KayakoAPI:
         By default, all items are returned. 
         
         e.x.
-            api.get_all(Department)
-            >>> [<Department....>, ....]
+            >>> api.get_all(Department)
+            [<Department....>, ....]
     
         Special Cases:
         
@@ -328,6 +346,48 @@ class KayakoAPI:
                 
         '''
         return object.get_all(self, *args, **kwargs)
+
+    def _match_filter(self, object, **filter):
+        '''
+        Returns whether or not every given attribute of an object is equal
+        to the given values.
+        '''
+        for key, value in filter.iteritems():
+            attr = getattr(object, key)
+            if isinstance(attr, list):
+                if value not in attr:
+                    return False
+            elif attr != value:
+                return False
+        return True
+
+    def filter(self, object, args=(), kwargs={}, **filter):
+        '''
+        Gets all KayakoObjects matching a filter.
+        
+        e.x.
+            >>> api.filter(Department, args=(2), module='tickets')
+            [<Department module='tickets'...>, <Department module='tickets'...>, ...]
+        '''
+        objects = self.get_all(object, *args, **kwargs)
+        results = []
+        for result in objects:
+            if self._match_filter(result, **filter):
+                results.append(result)
+        return results
+
+    def first(self, object, args=(), kwargs={}, **filter):
+        '''
+        Returns the first KayakoObject found matching a given filter.
+        
+        e.x.
+            >>> api.filter(Department, args=(2), module='tickets')
+            <Department module='tickets'>
+        '''
+        objects = self.get_all(object, *args, **kwargs)
+        for result in objects:
+            if self._match_filter(result, **filter):
+                return result
 
     def get(self, object, *args):
         '''

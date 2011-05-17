@@ -5,17 +5,17 @@ Python API wrapper for Kayako 4.01.204
 
 ::
 
-    from kayako import KayakoAPI, User, Ticket, Department, UnsetParameter
-    api = KayakoAPI('http://kayako.foo.com/api/index.php', 's8v092-2lksd-9cso-c2', 'somesecret')
-    departments = api.get_all(Department)
-    for department in departments:
-        # Print every ticket in every department
-        tickets = api.get_all(Ticket, department.id)
-        for ticket in tickets:
-            print department, ticket
-    >>> <Department...> <Ticket...>
-    >>> <Department...> <Ticket...>
-    >>> <Department...> <Ticket...>
+    >>> from kayako import KayakoAPI, User, Ticket, Department, UnsetParameter
+    >>> api = KayakoAPI('http://kayako.foo.com/api/index.php', 's8v092-2lksd-9cso-c2', 'somesecret')
+    >>> departments = api.get_all(Department)
+    >>> for department in departments:
+    >>>     # Print every ticket in every department
+    >>>     tickets = api.get_all(Ticket, department.id)
+    >>>     for ticket in tickets:
+    >>>         print department, ticket
+    <Department...> <Ticket...>
+    <Department...> <Ticket...>
+    <Department...> <Ticket...>
     
 **Add an object**
 
@@ -45,8 +45,8 @@ Python API wrapper for Kayako 4.01.204
     
     e.x. ::
     
-        api.get_all(Department)
-        >>> [<Department....>, ....]
+        >>> api.get_all(Department)
+        [<Department....>, ....]
 
     *Special Cases:*
     
@@ -64,14 +64,30 @@ Python API wrapper for Kayako 4.01.204
         ``api.get_all(TicketPost, ticketid)``
             Return all TicketPosts for a Ticket with the given ID.
 
+``api.filter(Object, args=(), kwargs={}, **filter)``
+
+	Gets all KayakoObjects matching a filter.
+        
+        e.x.
+            >>> api.filter(Department, args=(2), module='tickets')
+            [<Department module='tickets'...>, <Department module='tickets'...>, ...]
+            
+``api.first(Object, args=(), kwargs={}, **filter)``
+
+	Returns the first KayakoObject found matching a given filter.
+        
+        e.x.
+            >>> api.filter(Department, args=(2), module='tickets')
+            <Department module='tickets'>
+
 ``api.get(Object, *args)``
 
     *Get a Kayako Object of the given type by ID.*
     
     e.x. ::
     
-        api.get(User, 112359)
-        >>> <User (112359)....>
+        >>> api.get(User, 112359)
+        <User (112359)....>
     
     *Special Cases:*
         
