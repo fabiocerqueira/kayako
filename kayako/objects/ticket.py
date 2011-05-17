@@ -206,7 +206,7 @@ class Ticket(KayakoObject):
             ticketstatusid   The Ticket Status ID
             ticketpriorityid The Ticket Priority ID
             tickettypeid     The Ticket Type ID
-        One of these must be present:
+        At least one of these must be present:
             userid           The User ID, if the ticket is to be created as a user.
             staffid          The Staff ID, if the ticket is to be created as a staff
         Optional:
@@ -221,8 +221,8 @@ class Ticket(KayakoObject):
             if required_parameter not in parameters:
                 raise KayakoRequestError('Cannot add %s: Missing required field: %s.' % (self.__class__.__name__, required_parameter))
 
-        if ('userid' not in parameters and 'staffid' not in parameters) or ('userid' in parameters and 'staffid' in parameters):
-            raise KayakoRequestError('To add a Ticket, just one of the following parameters must be set: userid, staffid. (id: %s)' % self.id)
+        if 'userid' not in parameters and 'staffid' not in parameters:
+            raise KayakoRequestError('To add a Ticket, at least one of the following parameters must be set: userid, staffid. (id: %s)' % self.id)
 
         response = self.api._request(self.controller, 'POST', **parameters)
         tree = etree.parse(response)

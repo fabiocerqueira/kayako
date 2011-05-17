@@ -333,7 +333,7 @@ class TestTicket(KayakoAPITest):
         self.assertRaises(KayakoRequestError, ticket.add)
 
     def test_add_with_both_staffid_and_userid(self):
-        from kayako.exception import KayakoRequestError
+        from kayako.core.lib import UnsetParameter
         from kayako.objects import Ticket
 
         ticket = self.api.create(Ticket)
@@ -353,7 +353,9 @@ class TestTicket(KayakoAPITest):
         ticket.ownerstaffid = 1
         ticket.type = 'default'
 
-        self.assertRaises(KayakoRequestError, ticket.add)
+        ticket.add()
+
+        assert ticket.id is not UnsetParameter
 
 
     def test_add_save_delete(self):
