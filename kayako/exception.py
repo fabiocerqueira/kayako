@@ -14,13 +14,17 @@ class KayakoError(StandardError):
 
     @property
     def read(self):
+        '''
+        Returns the read function of the first readable argument in this
+        exception.
+        '''
         if self.args:
             for arg in self.args:
                 if hasattr(arg, 'read'):
                     if callable(arg.read):
-                        return arg.read()
-                    else:
                         return arg.read
+                    else:
+                        return lambda: arg.read
 
 class KayakoInitializationError(KayakoError):
     pass

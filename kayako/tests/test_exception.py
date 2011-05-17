@@ -23,13 +23,13 @@ class TestException(unittest.TestCase):
         from StringIO import StringIO
         from kayako.exception import KayakoError
         error = KayakoError(StringIO('abc'))
-        assert error.read == 'abc'
+        assert error.read() == 'abc'
 
     def test_kayako_error_read_attribute(self):
         from kayako.exception import KayakoError
         class Read(object):
             read = 'abc123'
         error = KayakoError(Read())
-        assert error.read == 'abc123'
+        assert error.read() == 'abc123'
 
 
