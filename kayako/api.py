@@ -292,21 +292,21 @@ class KayakoAPI(object):
         else:
             raise KayakoRequestError('Invalid request method: %s not supported.' % method)
 
-        print 'REQUEST:'
-        print method
-        print 'URL:'
-        print url.replace('&', '\n&') if url else 'None'
-        print 'DATA:'
-        print data.replace('&', '\n&') if data else 'None'
-        print '------'
+#        print 'REQUEST:'
+#        print method
+#        print 'URL:'
+#        print url.replace('&', '\n&') if url else 'None'
+#        print 'DATA:'
+#        print data.replace('&', '\n&') if data else 'None'
+#        print '------'
 
         try:
             response = urllib2.urlopen(request)
         except urllib2.HTTPError, error:
-            print error.read()
+#            print error.read()
             raise KayakoResponseError(error)
         except urllib2.URLError, error:
-            print error.read()
+#            print error.read()
             raise KayakoRequestError(error)
         return response
 
