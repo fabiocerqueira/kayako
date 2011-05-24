@@ -14,6 +14,15 @@ from kayako.tests import KayakoAPITest
 
 class TestTicketNote(KayakoAPITest):
 
+    SUBJECT = 'DELETEME'
+
+    def tearDown(self):
+        from kayako.objects import Department, Ticket
+        dept = self.api.first(Department, module='tickets')
+        test_tickets = self.api.filter(Ticket, args=(dept.id,), subject=self.SUBJECT)
+        for ticket in test_tickets:
+            ticket.delete()
+
 #    def test_get_nonexistant(self):
 #        from kayako.objects import Department, Ticket, TicketNote
 #
@@ -25,7 +34,7 @@ class TestTicketNote(KayakoAPITest):
 #                break
 #
 #        ticket = api.create(Ticket)
-#        ticket.subject = 'DELETE_ME'
+#        ticket.subject = self.SUBJECT
 #        ticket.fullname = 'Unit Test'
 #        ticket.email = 'test@example.com'
 #        ticket.contents = 'test'
@@ -55,7 +64,7 @@ class TestTicketNote(KayakoAPITest):
 #                break
 #
 #        ticket = api.create(Ticket)
-#        ticket.subject = 'DELETE_ME'
+#        ticket.subject = self.SUBJECT
 #        ticket.fullname = 'Unit Test'
 #        ticket.email = 'test@example.com'
 #        ticket.contents = 'test'
@@ -89,7 +98,7 @@ class TestTicketNote(KayakoAPITest):
 #                break
 #
 #        ticket = api.create(Ticket)
-#        ticket.subject = 'DELETE_ME'
+#        ticket.subject = self.SUBJECT
 #        ticket.fullname = 'Unit Test'
 #        ticket.email = 'test@example.com'
 #        ticket.contents = 'test'
@@ -123,7 +132,7 @@ class TestTicketNote(KayakoAPITest):
 #                break
 #
 #        ticket = api.create(Ticket)
-#        ticket.subject = 'DELETE_ME'
+#        ticket.subject = self.SUBJECT
 #        ticket.fullname = 'Unit Test'
 #        ticket.email = 'test@example.com'
 #        ticket.contents = 'test'
@@ -160,7 +169,7 @@ class TestTicketNote(KayakoAPITest):
 #                break
 #
 #        ticket = api.create(Ticket)
-#        ticket.subject = 'DELETE_ME'
+#        ticket.subject = self.SUBJECT
 #        ticket.fullname = 'Unit Test'
 #        ticket.email = 'test@example.com'
 #        ticket.contents = 'test'
@@ -198,7 +207,7 @@ class TestTicketNote(KayakoAPITest):
                 break
 
         ticket = api.create(Ticket)
-        ticket.subject = 'DELETE_ME'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'

@@ -12,6 +12,15 @@ Created on May 9, 2011
 from kayako.tests import KayakoAPITest
 class TestStaff(KayakoAPITest):
 
+    EMAIL = 'deleteme@example.com'
+
+    def tearDown(self):
+        from kayako.objects import Staff
+        api = self.api
+        test_staff = api.filter(Staff, email=self.EMAIL)
+        for staff in test_staff:
+            staff.delete()
+
     def test_add_get_nonexistant(self):
         from kayako.objects import Staff
         obj = self.api.get(Staff, '123123')
@@ -19,7 +28,7 @@ class TestStaff(KayakoAPITest):
 
     def test_add_get_bare(self):
         from kayako.objects import Staff
-        obj = self.api.create(Staff, firstname='DELETEME', lastname='DELETEME', username='DELETEME', email='deleteme@example.com', password='DELETEME', staffgroupid=1)
+        obj = self.api.create(Staff, firstname='DELETEME', lastname='DELETEME', username='DELETEME', email=self.EMAIL, password='DELETEME', staffgroupid=1)
         obj.add()
         obj2 = self.api.get(Staff, obj.id) # Shouldn't raise errors
         obj.delete()
@@ -27,7 +36,7 @@ class TestStaff(KayakoAPITest):
 
     def test_add_get_full(self):
         from kayako.objects import Staff
-        obj = self.api.create(Staff, firstname='DELETEME', lastname='DELETEME', username='DELETEME', email='deleteme@example.com', password='DELETEME', staffgroupid=1,
+        obj = self.api.create(Staff, firstname='DELETEME', lastname='DELETEME', username='DELETEME', email=self.EMAIL, password='DELETEME', staffgroupid=1,
                               designation='TEST', mobilenumber='123-456-7890', signature='TEST', isenabled=False, greeting='Mr.', timezone='MST', enabledst=True)
         obj.add()
         obj2 = self.api.get(Staff, obj.id) # Shouldn't raise errors
@@ -49,7 +58,7 @@ class TestStaff(KayakoAPITest):
         staff.username = 'test_username'
         staff.password = 'test_password'
         staff.staffgroupid = 1
-        staff.email = 'test@example.com'
+        staff.email = self.EMAIL
 
         self.assertRaises(KayakoRequestError, staff.add)
 
@@ -62,7 +71,7 @@ class TestStaff(KayakoAPITest):
         staff.username = 'test_username'
         staff.password = 'test_password'
         staff.staffgroupid = 1
-        staff.email = 'test@example.com'
+        staff.email = self.EMAIL
 
         self.assertRaises(KayakoRequestError, staff.add)
 
@@ -75,7 +84,7 @@ class TestStaff(KayakoAPITest):
         staff.lastname = 'test_lastname'
         staff.password = 'test_password'
         staff.staffgroupid = 1
-        staff.email = 'test@example.com'
+        staff.email = self.EMAIL
 
         self.assertRaises(KayakoRequestError, staff.add)
 
@@ -88,7 +97,7 @@ class TestStaff(KayakoAPITest):
         staff.lastname = 'test_lastname'
         staff.username = 'test_username'
         staff.staffgroupid = 1
-        staff.email = 'test@example.com'
+        staff.email = self.EMAIL
 
         self.assertRaises(KayakoRequestError, staff.add)
 
@@ -101,7 +110,7 @@ class TestStaff(KayakoAPITest):
         staff.lastname = 'test_lastname'
         staff.username = 'test_username'
         staff.password = 'test_password'
-        staff.email = 'test@example.com'
+        staff.email = self.EMAIL
 
         self.assertRaises(KayakoRequestError, staff.add)
 
@@ -129,22 +138,22 @@ class TestStaff(KayakoAPITest):
         from kayako.objects import Staff
 
         staff = self.api.create(Staff)
-        staff.firstname = 'DELETE_ME'
+        staff.firstname = 'DELETEME'
         staff.lastname = 'test_lastname'
         staff.username = 'test_username'
         staff.password = 'test_password'
         staff.staffgroupid = 1
-        staff.email = 'test@example.com'
+        staff.email = self.EMAIL
         staff.add()
         assert staff.id is not UnsetParameter
-        staff.firstname = 'DELETE_ME2'
+        staff.firstname = 'DELETEME2'
         staff.save()
         staff.delete()
 
         found_error = False
         all_staff = self.api.get_all(Staff)
         for staff in all_staff:
-            if staff.firstname == 'DELETE_ME' or staff.firstname == 'DELETE_ME2':
+            if staff.email == self.EMAIL:
                 staff.delete()
                 found_error = True
         if found_error:
@@ -157,6 +166,13 @@ class TestStaff(KayakoAPITest):
         self.assertRaises(KayakoRequestError, staff.delete)
 
 class TestStaffGroup(KayakoAPITest):
+
+    def tearDown(self):
+        from kayako.objects import StaffGroup
+        all_groups = self.api.get_all(StaffGroup)
+        for group in all_groups:
+            if group.title == 'DELETEME' or group.title == 'DELETEME2':
+                group.delete()
 
     def test_add_get_nonexistant(self):
         from kayako.objects import StaffGroup
@@ -212,18 +228,18 @@ class TestStaffGroup(KayakoAPITest):
         from kayako.objects import StaffGroup
 
         staffgroup = self.api.create(StaffGroup)
-        staffgroup.title = 'DELETE_ME'
+        staffgroup.title = 'DELETEME'
         staffgroup.isadmin = 0
         staffgroup.add()
         assert staffgroup.id is not UnsetParameter
-        staffgroup.title = 'DELETE_ME2'
+        staffgroup.title = 'DELETEME2'
         staffgroup.save()
         staffgroup.delete()
 
         found_error = False
         all_staff_groups = self.api.get_all(StaffGroup)
         for staffgroup in all_staff_groups:
-            if staffgroup.title == 'DELETE_ME' or staffgroup.title == 'DELETE_ME2':
+            if staffgroup.title == 'DELETEME' or staffgroup.title == 'DELETEME2':
                 staffgroup.delete()
                 found_error = True
         if found_error:

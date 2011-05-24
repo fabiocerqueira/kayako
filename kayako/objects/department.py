@@ -63,6 +63,30 @@ class Department(KayakoObject):
         )
         return params
 
+    def _update_from_response(self, department_tree):
+        usergroups_node = department_tree.find('usergroups')
+        if usergroups_node is not None:
+            usergroups = []
+            for id_node in usergroups_node.findall('id'):
+                id = self._get_int(id_node)
+                usergroups.append(id)
+            self.usergroupid = usergroups
+
+        for int_node in ['id', 'displayorder', 'parentdepartmentid']:
+            node = department_tree.find(int_node)
+            if node is not None:
+                setattr(self, int_node, self._get_int(node, required=False))
+
+        for str_node in ['title', 'type', 'module']:
+            node = department_tree.find(str_node)
+            if node is not None:
+                setattr(self, str_node, self._get_string(node))
+
+        for bool_node in ['uservisibilitycustom']:
+            node = department_tree.find(bool_node)
+            if node is not None:
+                setattr(self, bool_node, self._get_boolean(node, required=False))
+
     @classmethod
     def get_all(cls, api):
         response = api._request(cls.controller, 'GET')
@@ -82,11 +106,14 @@ class Department(KayakoObject):
     def add(self):
         response = self._add(self.controller)
         tree = etree.parse(response)
-        print etree.tostring(tree)
-        self.id = int(tree.find('department').find('id').text)
+        node = tree.find('department')
+        self._update_from_response(node)
 
     def save(self):
-        self._save('%s/%s/' % (self.controller, self.id))
+        response = self._save('%s/%s/' % (self.controller, self.id))
+        tree = etree.parse(response)
+        node = tree.find('department')
+        self._update_from_response(node)
 
     def delete(self):
         self._delete('%s/%s/' % (self.controller, self.id))

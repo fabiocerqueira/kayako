@@ -75,12 +75,7 @@ class User(KayakoObject):
 
     @classmethod
     def _parse_user(cls, user_tree):
-        emails = []
-        emails_tree = user_tree.find('emails')
-        if emails_tree is not None:
-            emails = [cls._get_string(email_node) for email_node in emails_tree.findall('email')]
-        else:
-            emails = [cls._get_string(email_node) for email_node in user_tree.findall('email')]
+        emails = [cls._get_string(email_node) for email_node in user_tree.findall('email')]
         params = dict(
             id=cls._get_int(user_tree.find('id')),
             fullname=cls._get_string(user_tree.find('fullname')),
@@ -102,8 +97,32 @@ class User(KayakoObject):
         )
         return params
 
+    def _update_from_response(self, user_tree):
+
+        self.emails = [self._get_string(email_node) for email_node in user_tree.findall('email')]
+
+        for int_node in ['id', 'usergroupid', 'userorganizationid', 'slaplanid']:
+            node = user_tree.find(int_node)
+            if node is not None:
+                setattr(self, int_node, self._get_int(node, required=False))
+
+        for str_node in ['fullname', 'salutation', 'designation', 'phone', 'userrole', 'timezone']:
+            node = user_tree.find(str_node)
+            if node is not None:
+                setattr(self, str_node, self._get_string(node))
+
+        for bool_node in ['isenabled', 'enabledst']:
+            node = user_tree.find(bool_node)
+            if node is not None:
+                setattr(self, bool_node, self._get_boolean(node, required=False))
+
+        for date_node in ['slaplanexpiry', 'userexpiry', 'dateline', 'lastvisit']:
+            node = user_tree.find(date_node)
+            if node is not None:
+                setattr(self, date_node, self._get_date(node))
+
     @classmethod
-    def get_all(cls, api, marker=1, maxitems=1000):
+    def get_all(cls, api, marker=0, maxitems=1000):
         '''
         Returns the users starting at User ID ``marker`` pulling in a maximum
         ``maxitems`` number of Users.
@@ -125,10 +144,14 @@ class User(KayakoObject):
     def add(self):
         response = self._add(self.controller)
         tree = etree.parse(response)
-        self.id = int(tree.find('user').find('id').text)
+        node = tree.find('user')
+        self._update_from_response(node)
 
     def save(self):
-        self._save('%s/%s/' % (self.controller, self.id))
+        response = self._save('%s/%s/' % (self.controller, self.id))
+        tree = etree.parse(response)
+        node = tree.find('user')
+        self._update_from_response(node)
 
     def delete(self):
         self._delete('%s/%s/' % (self.controller, self.id))
@@ -170,6 +193,22 @@ class UserGroup(KayakoObject):
         )
         return params
 
+    def _update_from_response(self, user_group_tree):
+        for int_node in ['id']:
+            node = user_group_tree.find(int_node)
+            if node is not None:
+                setattr(self, int_node, self._get_int(node, required=False))
+
+        for str_node in ['title', 'grouptype']:
+            node = user_group_tree.find(str_node)
+            if node is not None:
+                setattr(self, str_node, self._get_string(node))
+
+        for bool_node in ['ismaster']:
+            node = user_group_tree.find(bool_node)
+            if node is not None:
+                setattr(self, bool_node, self._get_boolean(node, required=False))
+
     @classmethod
     def get_all(cls, api):
         response = api._request(cls.controller, 'GET')
@@ -189,10 +228,14 @@ class UserGroup(KayakoObject):
     def add(self):
         response = self._add(self.controller)
         tree = etree.parse(response)
-        self.id = int(tree.find('usergroup').find('id').text)
+        node = tree.find('usergroup')
+        self._update_from_response(node)
 
     def save(self):
-        self._save('%s/%s/' % (self.controller, self.id))
+        response = self._save('%s/%s/' % (self.controller, self.id))
+        tree = etree.parse(response)
+        node = tree.find('usergroup')
+        self._update_from_response(node)
 
     def delete(self):
         self._delete('%s/%s/' % (self.controller, self.id))
@@ -265,6 +308,22 @@ class UserOrganization(KayakoObject):
         )
         return params
 
+    def _update_from_response(self, user_tree):
+        for int_node in ['id', 'slaplanid']:
+            node = user_tree.find(int_node)
+            if node is not None:
+                setattr(self, int_node, self._get_int(node, required=False))
+
+        for str_node in ['name', 'organizationtype', 'address', 'city', 'state', 'postalcode', 'country', 'phone', 'fax', 'website']:
+            node = user_tree.find(str_node)
+            if node is not None:
+                setattr(self, str_node, self._get_string(node))
+
+        for date_node in ['dateline', 'lastupdate', 'slaplanexpiry']:
+            node = user_tree.find(date_node)
+            if node is not None:
+                setattr(self, date_node, self._get_date(node, required=False))
+
     @classmethod
     def get_all(cls, api):
         response = api._request(cls.controller, 'GET')
@@ -284,10 +343,14 @@ class UserOrganization(KayakoObject):
     def add(self):
         response = self._add(self.controller)
         tree = etree.parse(response)
-        self.id = int(tree.find('userorganization').find('id').text)
+        node = tree.find('userorganization')
+        self._update_from_response(node)
 
     def save(self):
-        self._save('%s/%s/' % (self.controller, self.id))
+        response = self._save('%s/%s/' % (self.controller, self.id))
+        tree = etree.parse(response)
+        node = tree.find('userorganization')
+        self._update_from_response(node)
 
     def delete(self):
         self._delete('%s/%s/' % (self.controller, self.id))

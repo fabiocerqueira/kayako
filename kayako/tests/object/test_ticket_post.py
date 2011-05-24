@@ -14,6 +14,15 @@ from kayako.tests import KayakoAPITest
 
 class TestTicketPost(KayakoAPITest):
 
+    SUBJECT = 'DELETEME'
+
+    def tearDown(self):
+        from kayako.objects import Department, Ticket
+        dept = self.api.first(Department, module='tickets')
+        test_tickets = self.api.filter(Ticket, args=(dept.id,), subject=self.SUBJECT)
+        for ticket in test_tickets:
+            ticket.delete()
+
     def test_get_nonexistant(self):
         from kayako.objects import Department, Ticket, TicketPost
 
@@ -25,7 +34,7 @@ class TestTicketPost(KayakoAPITest):
                 break
 
         ticket = api.create(Ticket)
-        ticket.subject = 'DELETE_ME'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -45,7 +54,7 @@ class TestTicketPost(KayakoAPITest):
         assert obj is None
 
     def test_add_get_userid(self):
-        from kayako.objects import Department, Ticket, TicketPost
+        from kayako.objects import Department, Ticket, TicketPost, User
         api = self.api
 
         depts = api.get_all(Department)
@@ -53,8 +62,10 @@ class TestTicketPost(KayakoAPITest):
             if dept.module == 'tickets':
                 break
 
+        user = api.get(User, 0)
+
         ticket = api.create(Ticket)
-        ticket.subject = 'DELETE_ME'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -62,8 +73,8 @@ class TestTicketPost(KayakoAPITest):
         ticket.ticketstatusid = 1
         ticket.ticketpriorityid = 1
         ticket.tickettypeid = 1
-        ticket.userid = 1
-        ticket.ownerstaffid = 1
+        ticket.userid = user.id
+        ticket.ownerstaffid = user.id
         ticket.type = 'default'
         ticket.add()
 
@@ -71,7 +82,7 @@ class TestTicketPost(KayakoAPITest):
         ticket_post.ticketid = ticket.id
         ticket_post.subject = 'test_post'
         ticket_post.contents = 'testing a post'
-        ticket_post.userid = 1
+        ticket_post.userid = user.id
         ticket_post.add()
 
         obj2 = api.get(TicketPost, ticket.id, ticket_post.id)
@@ -80,7 +91,7 @@ class TestTicketPost(KayakoAPITest):
         assert obj2 is not None
 
     def test_add_get_staffid(self):
-        from kayako.objects import Department, Ticket, TicketPost
+        from kayako.objects import Department, Ticket, TicketPost, User, Staff
         api = self.api
 
         depts = api.get_all(Department)
@@ -88,8 +99,11 @@ class TestTicketPost(KayakoAPITest):
             if dept.module == 'tickets':
                 break
 
+        user = api.get(User, 0)
+        staff = api.get(Staff, 0)
+
         ticket = api.create(Ticket)
-        ticket.subject = 'DELETE_ME'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -97,8 +111,8 @@ class TestTicketPost(KayakoAPITest):
         ticket.ticketstatusid = 1
         ticket.ticketpriorityid = 1
         ticket.tickettypeid = 1
-        ticket.userid = 1
-        ticket.ownerstaffid = 1
+        ticket.userid = user.id
+        ticket.ownerstaffid = user.id
         ticket.type = 'default'
         ticket.add()
 
@@ -106,7 +120,7 @@ class TestTicketPost(KayakoAPITest):
         ticket_post.ticketid = ticket.id
         ticket_post.subject = 'test_post'
         ticket_post.contents = 'testing a post'
-        ticket_post.staffid = 1
+        ticket_post.staffid = staff.id
         ticket_post.add()
 
         obj2 = api.get(TicketPost, ticket.id, ticket_post.id)
@@ -116,7 +130,7 @@ class TestTicketPost(KayakoAPITest):
 
 
     def test_get_all(self):
-        from kayako.objects import Department, Ticket, TicketPost
+        from kayako.objects import Department, Ticket, TicketPost, User
 
         api = self.api
 
@@ -125,8 +139,10 @@ class TestTicketPost(KayakoAPITest):
             if dept.module == 'tickets':
                 break
 
+        user = api.get(User, 0)
+
         ticket = api.create(Ticket)
-        ticket.subject = 'DELETE_ME'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -134,8 +150,8 @@ class TestTicketPost(KayakoAPITest):
         ticket.ticketstatusid = 1
         ticket.ticketpriorityid = 1
         ticket.tickettypeid = 1
-        ticket.userid = 1
-        ticket.ownerstaffid = 1
+        ticket.userid = user.id
+        ticket.ownerstaffid = user.id
         ticket.type = 'default'
         ticket.add()
 
@@ -143,7 +159,7 @@ class TestTicketPost(KayakoAPITest):
         ticket_post.ticketid = ticket.id
         ticket_post.subject = 'test_post'
         ticket_post.contents = 'testing a post'
-        ticket_post.userid = 1
+        ticket_post.userid = user.id
         ticket_post.add()
 
         result = self.api.get_all(TicketPost, ticket.id)
@@ -155,7 +171,7 @@ class TestTicketPost(KayakoAPITest):
 
     def test_get(self):
         from kayako.core.lib import UnsetParameter
-        from kayako.objects import Department, Ticket, TicketPost
+        from kayako.objects import Department, Ticket, TicketPost, User
 
         api = self.api
 
@@ -164,8 +180,10 @@ class TestTicketPost(KayakoAPITest):
             if dept.module == 'tickets':
                 break
 
+        user = api.get(User, 0)
+
         ticket = api.create(Ticket)
-        ticket.subject = 'DELETE_ME'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -173,8 +191,8 @@ class TestTicketPost(KayakoAPITest):
         ticket.ticketstatusid = 1
         ticket.ticketpriorityid = 1
         ticket.tickettypeid = 1
-        ticket.userid = 1
-        ticket.ownerstaffid = 1
+        ticket.userid = user.id
+        ticket.ownerstaffid = user.id
         ticket.type = 'default'
         ticket.add()
 
@@ -184,7 +202,7 @@ class TestTicketPost(KayakoAPITest):
         ticket_post.ticketid = ticket.id
         ticket_post.subject = 'test_post'
         ticket_post.contents = 'testing a post'
-        ticket_post.userid = 1
+        ticket_post.userid = user.id
         ticket_post.add()
         assert ticket_post.ticketid == ticket.id
 
@@ -263,7 +281,7 @@ class TestTicketPost(KayakoAPITest):
 
     def test_add_delete(self):
         from kayako.core.lib import UnsetParameter
-        from kayako.objects import Department, Ticket, TicketPost
+        from kayako.objects import Department, Ticket, TicketPost, User
 
         api = self.api
 
@@ -272,8 +290,10 @@ class TestTicketPost(KayakoAPITest):
             if dept.module == 'tickets':
                 break
 
+        user = api.get(User, 0)
+
         ticket = api.create(Ticket)
-        ticket.subject = 'DELETE_ME'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -281,8 +301,8 @@ class TestTicketPost(KayakoAPITest):
         ticket.ticketstatusid = 1
         ticket.ticketpriorityid = 1
         ticket.tickettypeid = 1
-        ticket.userid = 1
-        ticket.ownerstaffid = 1
+        ticket.userid = user.id
+        ticket.ownerstaffid = user.id
         ticket.type = 'default'
         ticket.add()
 
@@ -290,7 +310,7 @@ class TestTicketPost(KayakoAPITest):
         ticket_post.ticketid = ticket.id
         ticket_post.subject = 'DELETE_ME'
         ticket_post.contents = 'testing a post'
-        ticket_post.userid = 1
+        ticket_post.userid = user.id
         ticket_post.add()
 
         assert ticket_post.id is not UnsetParameter

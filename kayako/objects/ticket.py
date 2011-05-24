@@ -118,9 +118,9 @@ class Ticket(KayakoObject):
             fullname=cls._get_string(ticket_tree.find('fullname')),
             email=cls._get_string(ticket_tree.find('email')),
             departmentid=cls._get_int(ticket_tree.find('departmentid')),
-            ticketstatusid=cls._get_int(ticket_tree.find('ticketstatusid'), required=False, strict=False),
+            ticketstatusid=cls._get_int(ticket_tree.find('ticketstatusid'), required=False),
             ticketpriorityid=cls._get_int(ticket_tree.find('priorityid')), # Note the difference, request param is ticketpriorityid, response is priorityid
-            tickettypeid=cls._get_int(ticket_tree.find('tickettypeid'), required=False, strict=False),
+            tickettypeid=cls._get_int(ticket_tree.find('tickettypeid'), required=False),
             userid=cls._get_int(ticket_tree.find('userid')),
             ownerstaffid=cls._get_int(ticket_tree.find('ownerstaffid')),
             flagtype=cls._parse_int(ticket_tree.get('flagtype'), 'flagtype'),
@@ -152,6 +152,36 @@ class Ticket(KayakoObject):
             posts=posts,
         )
         return params
+
+    def _update_from_response(self, ticket_tree):
+
+        ticketid = self._parse_int(ticket_tree.get('id'))
+        if ticketid is not None:
+            self.id = ticketid
+
+        priority_node = ticket_tree.find('priorityid')
+        if priority_node is not None:
+            self.ticketpriorityid = self._get_int(priority_node)
+
+        for int_node in ['departmentid', 'userid', 'ownerstaffid', 'flagtype', 'statusid', 'slaplanid', 'replies', 'creator', 'creationmode', 'creationtype', 'escalationruleid', 'ticketstatusid', 'tickettypeid', 'userorganizationid' ]:
+            node = ticket_tree.find(int_node)
+            if node is not None:
+                setattr(self, int_node, self._get_int(node, required=False))
+
+        for str_node in ['subject', 'email', 'displayid', 'userorganization', 'ownerstaffname', 'lastreplier', 'ipaddress', 'tags']:
+            node = ticket_tree.find(str_node)
+            if node is not None:
+                setattr(self, str_node, self._get_string(node))
+
+        for bool_node in ['isescalated']:
+            node = ticket_tree.find(bool_node)
+            if node is not None:
+                setattr(self, bool_node, self._get_boolean(node, required=False))
+
+        for date_node in ['creationtime', 'lastactivity', 'lastuserreply', 'nextreplydue', 'resolutiondue', ]:
+            node = ticket_tree.find(date_node)
+            if node is not None:
+                setattr(self, date_node, self._get_date(node, required=False))
 
     @classmethod
     def get_all(cls, api, departmentid, ticketstatusid= -1, ownerstaffid= -1, userid= -1):
@@ -226,7 +256,8 @@ class Ticket(KayakoObject):
 
         response = self.api._request(self.controller, 'POST', **parameters)
         tree = etree.parse(response)
-        self.id = int(tree.find('ticket').get('id'))
+        node = tree.find('ticket')
+        self._update_from_response(node)
 
     def save(self):
         '''
@@ -243,7 +274,10 @@ class Ticket(KayakoObject):
             ownerstaffid     The Owner Staff ID, if you want to set an Owner for this ticket
             userid           The User ID, if you want to change the user for this ticket 
         '''
-        self._save('%s/%s/' % (self.controller, self.id))
+        response = self._save('%s/%s/' % (self.controller, self.id))
+        tree = etree.parse(response)
+        node = tree.find('ticket')
+        self._update_from_response(node)
 
     def delete(self):
         self._delete('%s/%s/' % (self.controller, self.id))
@@ -301,6 +335,22 @@ class TicketAttachment(KayakoObject):
         )
         return params
 
+    def _update_from_response(self, ticket_attachment_tree):
+        for int_node in ['id', 'ticketid', 'ticketpostid', 'filesize']:
+            node = ticket_attachment_tree.find(int_node)
+            if node is not None:
+                setattr(self, int_node, self._get_int(node, required=False))
+
+        for str_node in ['filename', 'filetype', 'contents']:
+            node = ticket_attachment_tree.find(str_node)
+            if node is not None:
+                setattr(self, str_node, self._get_string(node))
+
+        for date_node in ['dateline']:
+            node = ticket_attachment_tree.find(date_node)
+            if node is not None:
+                setattr(self, date_node, self._get_date(node, required=False))
+
     @classmethod
     def get_all(cls, api, ticketid):
         '''
@@ -338,7 +388,8 @@ class TicketAttachment(KayakoObject):
         '''
         response = self._add(self.controller)
         tree = etree.parse(response)
-        self.id = int(tree.find('attachment').find('id').text)
+        node = tree.find('attachment')
+        self._update_from_response(node)
 
     def delete(self):
         if self.ticketid is None or self.ticketid is UnsetParameter:
@@ -414,6 +465,25 @@ class TicketNote(KayakoObject):
         )
         return params
 
+    def _update_from_response(self, ticket_note_tree):
+
+        self.contents = ticket_note_tree.text
+
+        for int_attr in ['staffid', 'forstaffid', 'notecolor', 'creatorstaffid']:
+            attr = ticket_note_tree.get(int_attr)
+            if attr is not None:
+                setattr(self, int_attr, self._parse_int(attr, required=False))
+
+        for str_attr in ['type', 'creatorstaffname']:
+            attr = ticket_note_tree.get(str_attr)
+            if attr is not None:
+                setattr(self, str_attr, attr)
+
+        for date_attr in ['creationdate']:
+            attr = ticket_note_tree.get(date_attr)
+            if attr is not None:
+                setattr(self, date_attr, self._parse_date(attr, required=False))
+
     @classmethod
     def get_all(cls, api, ticketid):
         '''
@@ -461,10 +531,10 @@ class TicketNote(KayakoObject):
         if ('fullname' not in parameters and 'staffid' not in parameters) or ('fullname' in parameters and 'staffid' in parameters):
             raise KayakoRequestError('To add a TicketNote, just one of the following parameters must be set: fullname, staffid. (id: %s)' % self.id)
 
-        #response = self.api._request(self.controller, 'POST', **parameters)
-        self.api._request(self.controller, 'POST', **parameters)
-        #tree = etree.parse(response)
-        #self.id = int(tree.find('note').get('id'))
+        response = self.api._request(self.controller, 'POST', **parameters)
+        tree = etree.parse(response)
+        node = tree.find('note')
+        self._update_from_response(node)
 
 #    def delete(self):
 #        if self.ticketid is None or self.ticketid is UnsetParameter:
@@ -530,7 +600,7 @@ class TicketPost(KayakoObject):
     def _parse_ticket_post(cls, ticket_post_tree, ticket_id):
 
         params = dict(
-            id=cls._get_int(ticket_post_tree.find('ticketpostid')),
+            id=cls._get_int(ticket_post_tree.find('ticketpostid')), # Note different names
             ticketid=ticket_id,
             subject=cls._get_string(ticket_post_tree.find('subject')),
             contents=cls._get_string(ticket_post_tree.find('contents')),
@@ -549,6 +619,32 @@ class TicketPost(KayakoObject):
             issurveycomment=cls._get_boolean(ticket_post_tree.find('issurveycomment')),
         )
         return params
+
+    def _update_from_response(self, ticket_post_tree):
+
+        ticketpostid_node = ticket_post_tree.find('ticketpostid')
+        if ticketpostid_node is not None:
+            self.id = self._get_int(ticketpostid_node)
+
+        for int_node in ['userid', 'staffid', 'creator']:
+            node = ticket_post_tree.find(int_node)
+            if node is not None:
+                setattr(self, int_node, self._get_int(node, required=False))
+
+        for str_node in ['subject', 'contents', 'fullname', 'email', 'emailto', 'ipaddress']:
+            node = ticket_post_tree.find(str_node)
+            if node is not None:
+                setattr(self, str_node, self._get_string(node))
+
+        for bool_node in ['hasattachments', 'isthirdparty', 'ishtml', 'isemailed', 'issurveycomment']:
+            node = ticket_post_tree.find(bool_node)
+            if node is not None:
+                setattr(self, bool_node, self._get_boolean(node, required=False))
+
+        for date_node in ['dateline']:
+            node = ticket_post_tree.find(date_node)
+            if node is not None:
+                setattr(self, date_node, self._get_date(node, required=False))
 
     @classmethod
     def get_all(cls, api, ticketid):
@@ -601,7 +697,8 @@ class TicketPost(KayakoObject):
 
         response = self.api._request(self.controller, 'POST', **parameters)
         tree = etree.parse(response)
-        self.id = int(tree.find('post').find('ticketpostid').text)
+        node = tree.find('post')
+        self._update_from_response(node)
 
     def delete(self):
         if self.ticketid is None or self.ticketid is UnsetParameter:

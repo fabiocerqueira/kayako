@@ -9,17 +9,23 @@ from kayako.tests import KayakoAPITest
 
 class TestTicketAttachment(KayakoAPITest):
 
+    SUBJECT = 'DELETEME'
+
+    def tearDown(self):
+        from kayako.objects import Department, Ticket
+        dept = self.api.first(Department, module='tickets')
+        test_tickets = self.api.filter(Ticket, args=(dept.id,), subject=self.SUBJECT)
+        for ticket in test_tickets:
+            ticket.delete()
+
     def test_get_nonexistant(self):
         from kayako.objects import Department, Ticket, TicketAttachment
         api = self.api
 
-        depts = api.get_all(Department)
-        for dept in depts:
-            if dept.module == 'tickets':
-                break
+        dept = api.first(Department, module='tickets')
 
         ticket = api.create(Ticket)
-        ticket.subject = 'DELETE_ME'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -39,7 +45,7 @@ class TestTicketAttachment(KayakoAPITest):
         assert obj is None
 
     def test_add_get(self):
-        from kayako.objects import Department, Ticket, TicketAttachment, TicketPost
+        from kayako.objects import Department, Ticket, TicketAttachment, TicketPost, User
 
         api = self.api
 
@@ -48,8 +54,10 @@ class TestTicketAttachment(KayakoAPITest):
             if dept.module == 'tickets':
                 break
 
+        user = api.get(User, 0)
+
         ticket = api.create(Ticket)
-        ticket.subject = 'DELETE_ME'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -57,8 +65,8 @@ class TestTicketAttachment(KayakoAPITest):
         ticket.ticketstatusid = 1
         ticket.ticketpriorityid = 1
         ticket.tickettypeid = 1
-        ticket.userid = 1
-        ticket.ownerstaffid = 1
+        ticket.userid = user.id
+        ticket.ownerstaffid = user.id
         ticket.type = 'default'
         ticket.add()
 
@@ -66,7 +74,7 @@ class TestTicketAttachment(KayakoAPITest):
         ticket_post.ticketid = ticket.id
         ticket_post.subject = 'test_post'
         ticket_post.contents = 'testing a post'
-        ticket_post.userid = 1
+        ticket_post.userid = user.id
         ticket_post.add()
 
         ticket_attachment = api.create(TicketAttachment)
@@ -85,7 +93,7 @@ class TestTicketAttachment(KayakoAPITest):
 
 
     def test_get_all(self):
-        from kayako.objects import Department, Ticket, TicketAttachment, TicketPost
+        from kayako.objects import Department, Ticket, TicketAttachment, TicketPost, User
 
         api = self.api
 
@@ -94,8 +102,10 @@ class TestTicketAttachment(KayakoAPITest):
             if dept.module == 'tickets':
                 break
 
+        user = api.get(User, 0)
+
         ticket = api.create(Ticket)
-        ticket.subject = 'DELETE_ME'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -103,8 +113,8 @@ class TestTicketAttachment(KayakoAPITest):
         ticket.ticketstatusid = 1
         ticket.ticketpriorityid = 1
         ticket.tickettypeid = 1
-        ticket.userid = 1
-        ticket.ownerstaffid = 1
+        ticket.userid = user.id
+        ticket.ownerstaffid = user.id
         ticket.type = 'default'
         ticket.add()
 
@@ -112,7 +122,7 @@ class TestTicketAttachment(KayakoAPITest):
         ticket_post.ticketid = ticket.id
         ticket_post.subject = 'test_post'
         ticket_post.contents = 'testing a post'
-        ticket_post.userid = 1
+        ticket_post.userid = user.id
         ticket_post.add()
 
         ticket_attachment = api.create(TicketAttachment)
@@ -131,7 +141,7 @@ class TestTicketAttachment(KayakoAPITest):
         ticket.delete()
 
     def test_get_ticket_attachment(self):
-        from kayako.objects import Department, Ticket, TicketAttachment, TicketPost
+        from kayako.objects import Department, Ticket, TicketAttachment, TicketPost, User
 
         api = self.api
 
@@ -140,8 +150,10 @@ class TestTicketAttachment(KayakoAPITest):
             if dept.module == 'tickets':
                 break
 
+        user = api.get(User, 0)
+
         ticket = api.create(Ticket)
-        ticket.subject = 'DELETE_ME'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -149,8 +161,8 @@ class TestTicketAttachment(KayakoAPITest):
         ticket.ticketstatusid = 1
         ticket.ticketpriorityid = 1
         ticket.tickettypeid = 1
-        ticket.userid = 1
-        ticket.ownerstaffid = 1
+        ticket.userid = user.id
+        ticket.ownerstaffid = user.id
         ticket.type = 'default'
         ticket.add()
 
@@ -158,7 +170,7 @@ class TestTicketAttachment(KayakoAPITest):
         ticket_post.ticketid = ticket.id
         ticket_post.subject = 'test_post'
         ticket_post.contents = 'testing a post'
-        ticket_post.userid = 1
+        ticket_post.userid = user.id
         ticket_post.add()
 
         ticket_attachment = api.create(TicketAttachment)
@@ -229,7 +241,7 @@ class TestTicketAttachment(KayakoAPITest):
 
     def test_add_delete(self):
         from kayako.core.lib import UnsetParameter
-        from kayako.objects import Department, Ticket, TicketAttachment, TicketPost
+        from kayako.objects import Department, Ticket, TicketAttachment, TicketPost, User
 
         api = self.api
 
@@ -238,8 +250,10 @@ class TestTicketAttachment(KayakoAPITest):
             if dept.module == 'tickets':
                 break
 
+        user = api.get(User, 0)
+
         ticket = api.create(Ticket)
-        ticket.subject = 'DELETE_ME'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -247,8 +261,8 @@ class TestTicketAttachment(KayakoAPITest):
         ticket.ticketstatusid = 1
         ticket.ticketpriorityid = 1
         ticket.tickettypeid = 1
-        ticket.userid = 1
-        ticket.ownerstaffid = 1
+        ticket.userid = user.id
+        ticket.ownerstaffid = user.id
         ticket.type = 'default'
         ticket.add()
 
@@ -256,7 +270,7 @@ class TestTicketAttachment(KayakoAPITest):
         ticket_post.ticketid = ticket.id
         ticket_post.subject = 'DELETE_ME'
         ticket_post.contents = 'testing a post'
-        ticket_post.userid = 1
+        ticket_post.userid = user.id
         ticket_post.add()
 
         ticket_attachment = api.create(TicketAttachment)

@@ -64,3 +64,20 @@ class TestParameterObject(unittest.TestCase):
             __request_parameters__ = ['prop1', 'prop2']
 
         self.assertRaises(TypeError, obj, prop3='fake')
+
+    def test__update_parameters(self):
+        from kayako.core.lib import ParameterObject, UnsetParameter
+
+        class obj(ParameterObject):
+            __parameters__ = ['a', 'b', 'c']
+
+        o = obj(a=1)
+        assert o.a == 1
+        assert o.b is UnsetParameter
+        assert o.c is UnsetParameter
+        o._update_parameters(a=2, b=3)
+        assert o.a == 2
+        assert o.b == 3
+        assert o.c is UnsetParameter
+
+

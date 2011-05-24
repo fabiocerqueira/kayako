@@ -60,15 +60,10 @@ class ParameterObject(object):
         Creates this parameter object setting parameter values as given by
         keyword arguments.
         '''
-        unset_parameters = self.__parameters__[:]
-        for parameter, value in parameters.iteritems():
-            if parameter not in self.__parameters__:
-                raise TypeError("'%s' is an invalid keyword argument for %s" % (parameter, self.__class__.__name__))
-            else:
-                setattr(self, parameter, value)
-                unset_parameters.remove(parameter)
-        for unset_parameter in unset_parameters:
-            setattr(self, unset_parameter, UnsetParameter)
+        self._update_parameters(**parameters)
+        for parameter in self.__parameters__:
+            if parameter not in parameters:
+                setattr(self, parameter, UnsetParameter)
 
     @property
     def parameters(self):
@@ -84,6 +79,13 @@ class ParameterObject(object):
             if attribute is not UnsetParameter:
                 params[parameter] = attribute
         return params
+
+    def _update_parameters(self, **parameters):
+        for parameter, value in parameters.iteritems():
+            if parameter not in self.__parameters__:
+                raise TypeError("'%s' is an invalid keyword argument for %s" % (parameter, self.__class__.__name__))
+            else:
+                setattr(self, parameter, value)
 
     def __str__(self):
         return '<ParamterObject at %s>' % (hex(id(self)))

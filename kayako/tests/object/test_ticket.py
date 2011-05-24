@@ -13,12 +13,24 @@ from kayako.tests import KayakoAPITest
 
 class TestTicket(KayakoAPITest):
 
+    SUBJECT = 'DELETEME'
+    SUBJECT2 = 'DELETEME2'
+
+    def tearDown(self):
+        from kayako.objects import Department, Ticket
+        dept = self.api.first(Department, module='tickets')
+        all_tickets = self.api.get_all(Ticket, dept.id)
+        for ticket in all_tickets:
+            if ticket.subject == self.SUBJECT or ticket.subject == self.SUBJECT2:
+                ticket.delete()
+
     def test_get_nonexistant(self):
         from kayako.objects import Ticket
         obj = self.api.get(Ticket, 123123123)
         assert obj is None
 
     def test_add_get_bare_userid(self):
+        from kayako.core.lib import UnsetParameter
         from kayako.objects import Department, Ticket
 
         depts = self.api.get_all(Department)
@@ -26,11 +38,12 @@ class TestTicket(KayakoAPITest):
             if dept.module == 'tickets':
                 break
 
-        obj = self.api.create(Ticket, subject='DELETEME', fullname='DELETE ME', email='deleteme@example.com', contents='DELETE ME', departmentid=dept.id, ticketstatusid=1, ticketpriorityid=1, tickettypeid=1, userid=1)
+        obj = self.api.create(Ticket, subject=self.SUBJECT, fullname='DELETE ME', email='deleteme@example.com', contents='DELETE ME', departmentid=dept.id, ticketstatusid=1, ticketpriorityid=1, tickettypeid=1, userid=1)
         obj.add()
         obj2 = self.api.get(Ticket, obj.id)
         obj.delete()
         assert obj2 is not None
+        assert obj.displayid is not UnsetParameter
 
     def test_add_get_bare_staffid(self):
         from kayako.objects import Department, Ticket
@@ -40,7 +53,7 @@ class TestTicket(KayakoAPITest):
             if dept.module == 'tickets':
                 break
 
-        obj = self.api.create(Ticket, subject='DELETEME', fullname='DELETE ME', email='deleteme@example.com', contents='DELETE ME', departmentid=dept.id, ticketstatusid=1, ticketpriorityid=1, tickettypeid=1, staffid=1)
+        obj = self.api.create(Ticket, subject=self.SUBJECT, fullname='DELETE ME', email='deleteme@example.com', contents='DELETE ME', departmentid=dept.id, ticketstatusid=1, ticketpriorityid=1, tickettypeid=1, staffid=1)
         obj.add()
         obj2 = self.api.get(Ticket, obj.id)
         obj.delete()
@@ -54,7 +67,7 @@ class TestTicket(KayakoAPITest):
             if dept.module == 'tickets':
                 break
 
-        obj = self.api.create(Ticket, subject='DELETEME', fullname='DELETE ME', email='deleteme@example.com', contents='DELETE ME', departmentid=dept.id, ticketstatusid=1, ticketpriorityid=1, tickettypeid=1,
+        obj = self.api.create(Ticket, subject=self.SUBJECT, fullname='DELETE ME', email='deleteme@example.com', contents='DELETE ME', departmentid=dept.id, ticketstatusid=1, ticketpriorityid=1, tickettypeid=1,
                               userid=1, ownerstaffid=1, type='default')
         obj.add()
         obj2 = self.api.get(Ticket, obj.id)
@@ -69,7 +82,7 @@ class TestTicket(KayakoAPITest):
             if dept.module == 'tickets':
                 break
 
-        obj = self.api.create(Ticket, subject='DELETEME', fullname='DELETE ME', email='deleteme@example.com', contents='DELETE ME', departmentid=dept.id, ticketstatusid=1, ticketpriorityid=1, tickettypeid=1,
+        obj = self.api.create(Ticket, subject=self.SUBJECT, fullname='DELETE ME', email='deleteme@example.com', contents='DELETE ME', departmentid=dept.id, ticketstatusid=1, ticketpriorityid=1, tickettypeid=1,
                               staffid=1, ownerstaffid=1, type='default')
         obj.add()
         obj2 = self.api.get(Ticket, obj.id)
@@ -96,7 +109,7 @@ class TestTicket(KayakoAPITest):
                 break
 
         ticket = self.api.create(Ticket)
-        ticket.subject = 'DELETE_ME'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -123,7 +136,7 @@ class TestTicket(KayakoAPITest):
                 break
 
         ticket = self.api.create(Ticket)
-        ticket.subject = 'DELETE_ME'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -171,7 +184,7 @@ class TestTicket(KayakoAPITest):
 
         ticket = self.api.create(Ticket)
 
-        ticket.subject = 'TEST TICKET'
+        ticket.subject = self.SUBJECT
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
         ticket.departmentid = 1
@@ -192,7 +205,7 @@ class TestTicket(KayakoAPITest):
 
         ticket = self.api.create(Ticket)
 
-        ticket.subject = 'TEST TICKET'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.contents = 'test'
         ticket.departmentid = 1
@@ -213,7 +226,7 @@ class TestTicket(KayakoAPITest):
 
         ticket = self.api.create(Ticket)
 
-        ticket.subject = 'TEST TICKET'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.departmentid = 1
@@ -234,7 +247,7 @@ class TestTicket(KayakoAPITest):
 
         ticket = self.api.create(Ticket)
 
-        ticket.subject = 'TEST TICKET'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -255,7 +268,7 @@ class TestTicket(KayakoAPITest):
 
         ticket = self.api.create(Ticket)
 
-        ticket.subject = 'TEST TICKET'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -276,7 +289,7 @@ class TestTicket(KayakoAPITest):
 
         ticket = self.api.create(Ticket)
 
-        ticket.subject = 'TEST TICKET'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -297,7 +310,7 @@ class TestTicket(KayakoAPITest):
 
         ticket = self.api.create(Ticket)
 
-        ticket.subject = 'TEST TICKET'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -318,7 +331,7 @@ class TestTicket(KayakoAPITest):
 
         ticket = self.api.create(Ticket)
 
-        ticket.subject = 'TEST TICKET'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -338,7 +351,7 @@ class TestTicket(KayakoAPITest):
 
         ticket = self.api.create(Ticket)
 
-        ticket.subject = 'TEST TICKET'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -368,7 +381,7 @@ class TestTicket(KayakoAPITest):
                 break
 
         ticket = self.api.create(Ticket)
-        ticket.subject = 'DELETE_ME'
+        ticket.subject = self.SUBJECT
         ticket.fullname = 'Unit Test'
         ticket.email = 'test@example.com'
         ticket.contents = 'test'
@@ -381,14 +394,15 @@ class TestTicket(KayakoAPITest):
         ticket.type = 'default'
         ticket.add()
         assert ticket.id is not UnsetParameter
-        ticket.subject = 'DELETE_ME2'
+        assert ticket.displayid is not UnsetParameter
+        ticket.subject = self.SUBJECT2
         ticket.save()
         ticket.delete()
 
         found_error = False
         all = self.api.get_all(Ticket, 1, ticketstatusid=1, ownerstaffid=1, userid=1)
         for obj in all:
-            if obj.subject == 'DELETE_ME' or obj.subject == 'DELETE_ME2':
+            if obj.subject == self.SUBJECT or obj.subject == self.SUBJECT2:
                 obj.delete()
                 found_error = True
         if found_error:

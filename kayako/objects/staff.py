@@ -66,7 +66,7 @@ class Staff(KayakoObject):
     @classmethod
     def _parse_staff(cls, staff_tree):
         params = dict(
-            id=cls._get_int(staff_tree.find('id')),
+            id=cls._get_int(staff_tree.find('id'), required=False),
             firstname=cls._get_string(staff_tree.find('firstname')),
             lastname=cls._get_string(staff_tree.find('lastname')),
             username=cls._get_string(staff_tree.find('username')),
@@ -82,6 +82,22 @@ class Staff(KayakoObject):
             enabledst=cls._get_boolean(staff_tree.find('enabledst')),
         )
         return params
+
+    def _update_from_response(self, staff_tree):
+        for int_node in ['id', 'staffgroupid']:
+            node = staff_tree.find(int_node)
+            if node is not None:
+                setattr(self, int_node, self._get_int(node, required=False))
+
+        for str_node in ['firstname', 'lastname', 'username', 'email', 'designation', 'mobilenumber', 'signature', 'greeting', 'timezone', ]:
+            node = staff_tree.find(str_node)
+            if node is not None:
+                setattr(self, str_node, self._get_string(node))
+
+        for bool_node in ['isenabled', 'enabledst', ]:
+            node = staff_tree.find(bool_node)
+            if node is not None:
+                setattr(self, bool_node, self._get_boolean(node, required=False))
 
     @classmethod
     def get_all(cls, api):
@@ -102,10 +118,14 @@ class Staff(KayakoObject):
     def add(self):
         response = self._add(self.controller)
         tree = etree.parse(response)
-        self.id = int(tree.find('staff').find('id').text)
+        node = tree.find('staff')
+        self._update_from_response(node)
 
     def save(self):
-        self._save('%s/%s/' % (self.controller, self.id))
+        response = self._save('%s/%s/' % (self.controller, self.id))
+        tree = etree.parse(response)
+        node = tree.find('staff')
+        self._update_from_response(node)
 
     def delete(self):
         self._delete('%s/%s/' % (self.controller, self.id))
@@ -143,6 +163,22 @@ class StaffGroup(KayakoObject):
         )
         return params
 
+    def _update_from_response(self, staff_group_tree):
+        for int_node in ['id']:
+            node = staff_group_tree.find(int_node)
+            if node is not None:
+                setattr(self, int_node, self._get_int(node, required=False))
+
+        for str_node in ['title']:
+            node = staff_group_tree.find(str_node)
+            if node is not None:
+                setattr(self, str_node, self._get_string(node))
+
+        for bool_node in ['isadmin']:
+            node = staff_group_tree.find(bool_node)
+            if node is not None:
+                setattr(self, bool_node, self._get_boolean(node, required=False))
+
     @classmethod
     def get_all(cls, api):
         response = api._request(cls.controller, 'GET')
@@ -162,10 +198,14 @@ class StaffGroup(KayakoObject):
     def add(self):
         response = self._add(self.controller)
         tree = etree.parse(response)
-        self.id = int(tree.find('staffgroup').find('id').text)
+        node = tree.find('staffgroup')
+        self._update_from_response(node)
 
     def save(self):
-        self._save('%s/%s/' % (self.controller, self.id))
+        response = self._save('%s/%s/' % (self.controller, self.id))
+        tree = etree.parse(response)
+        node = tree.find('staffgroup')
+        self._update_from_response(node)
 
     def delete(self):
         self._delete('%s/%s/' % (self.controller, self.id))

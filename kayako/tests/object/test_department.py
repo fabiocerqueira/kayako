@@ -13,6 +13,16 @@ from kayako.tests import KayakoAPITest
 
 class TestDepartment(KayakoAPITest):
 
+    TITLE = 'DELETEME'
+    TITLE2 = 'DELETEME2'
+
+    def tearDown(self):
+        from kayako.objects import Department
+        all_departments = self.api.get_all(Department)
+        for department in all_departments:
+            if department.title == self.TITLE or department.title == self.TITLE2:
+                department.delete()
+
     def test_get_nonexistant(self):
         from kayako.objects import Department
         d = self.api.get(Department, '123123')
@@ -20,7 +30,7 @@ class TestDepartment(KayakoAPITest):
 
     def test_add_get_bare(self):
         from kayako.objects import Department
-        d = self.api.create(Department, title='test', module='tickets', type='private')
+        d = self.api.create(Department, title=self.TITLE, module='tickets', type='private')
         d.add()
         obj2 = self.api.get(Department, d.id)
         d.delete()
@@ -29,7 +39,7 @@ class TestDepartment(KayakoAPITest):
     def test_add_get_full(self):
         from kayako.objects import Department
         parent = self.api.first(Department, parentdepartmentid=0)
-        d = self.api.create(Department, title='test', module='tickets', type='private',
+        d = self.api.create(Department, title=self.TITLE, module='tickets', type='private',
                             displayorder=15, parentdepartmentid=parent.id, uservisibilitycustom=0, usergroupid=[1, 2])
         d.add()
         obj2 = self.api.get(Department, d.id)
@@ -57,7 +67,7 @@ class TestDepartment(KayakoAPITest):
         from kayako.objects import Department
         department = self.api.create(Department)
 
-        department.title = 'test'
+        department.title = self.TITLE
         department.type = 'public'
 
         self.assertRaises(KayakoRequestError, department.add)
@@ -67,7 +77,7 @@ class TestDepartment(KayakoAPITest):
         from kayako.objects import Department
         department = self.api.create(Department)
 
-        department.title = 'test'
+        department.title = self.TITLE
         department.module = 'tickets'
 
         self.assertRaises(KayakoRequestError, department.add)
@@ -83,19 +93,19 @@ class TestDepartment(KayakoAPITest):
         from kayako.objects import Department
 
         department = self.api.create(Department)
-        department.title = 'DELETE_ME'
+        department.title = self.TITLE
         department.module = 'tickets'
         department.type = 'private'
         department.add()
         assert department.id is not UnsetParameter
-        department.title = 'DELETE_ME2'
+        department.title = self.TITLE2
         department.save()
         department.delete()
 
         found_error = False
         all_depts = self.api.get_all(Department)
         for dept in all_depts:
-            if dept.title == 'DELETE_ME' or dept.title == 'DELETE_ME2':
+            if dept.title == self.TITLE or dept.title == self.TITLE2:
                 dept.delete()
                 found_error = True
         if found_error:
