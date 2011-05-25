@@ -14,22 +14,7 @@ import unittest
 
 class TestException(unittest.TestCase):
 
-    def test_kayako_error_no_read(self):
+    def test_KayakoError(self):
         from kayako.exception import KayakoError
-        error = KayakoError()
-        assert error.read is None
-
-    def test_kayako_error_read_function(self):
-        from StringIO import StringIO
-        from kayako.exception import KayakoError
-        error = KayakoError(StringIO('abc'))
-        assert error.read() == 'abc'
-
-    def test_kayako_error_read_attribute(self):
-        from kayako.exception import KayakoError
-        class Read(object):
-            read = 'abc123'
-        error = KayakoError(Read())
-        assert error.read() == 'abc123'
-
-
+        error = KayakoError('fail')
+        assert str(error)

@@ -169,6 +169,18 @@ class TestKayakoAPI(KayakoAPITest):
         from kayako.objects import Department
         self.assertRaises(TypeError, self.api.create, Department, bad_kwarg='bad_kwarg')
 
+    def test_invalid_url(self):
+        from kayako import KayakoAPI
+        from kayako.exception import KayakoRequestError
+        api = KayakoAPI('http://this.is.just.a.test.1293847987flsjclksjckn32.com', 'api_key', 'secret_key')
+        raised = False
+        try:
+            api._request('testing testing', 'GET')
+        except KayakoRequestError, error:
+            print error
+            raised = True
+        assert raised
+
 
 
 

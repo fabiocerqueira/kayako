@@ -26,12 +26,18 @@ class KayakoError(StandardError):
                     else:
                         return lambda: arg.read
 
+
 class KayakoInitializationError(KayakoError):
+    pass
+
+# COMM ERRORS
+
+class KayakoIOError(KayakoError):
     pass
 
 # REQUEST ERRORS
 
-class KayakoRequestError(KayakoError):
+class KayakoRequestError(KayakoIOError):
     pass
 
 class KayakoMethodNotImplementedError(KayakoRequestError):
@@ -43,5 +49,5 @@ class KayakoMethodNotImplementedError(KayakoRequestError):
 
 # RESPONSE ERROR
 
-class KayakoResponseError(KayakoError):
+class KayakoResponseError(KayakoIOError):
     pass

@@ -13,6 +13,7 @@ Created on May 5, 2011
 import base64
 import hashlib
 import hmac
+import logging
 import random
 import urllib
 import urllib2
@@ -21,6 +22,8 @@ from datetime import datetime
 
 from kayako.exception import KayakoRequestError, KayakoResponseError, KayakoInitializationError
 from kayako.core.lib import FOREVER
+
+log = logging.getLogger('kayako')
 
 class KayakoAPI(object):
     ''' 
@@ -266,6 +269,9 @@ class KayakoAPI(object):
         '''
         Get a response from the specified controller using the given parameters.
         '''
+
+        log.info('REQUEST: %s %s' % (controller, method))
+
         salt, b64signature = self._generate_signature()
 
         if method == 'GET':
@@ -292,22 +298,19 @@ class KayakoAPI(object):
         else:
             raise KayakoRequestError('Invalid request method: %s not supported.' % method)
 
-#        print 'REQUEST:'
-#        print method
-#        print 'URL:'
-#        print url.replace('&', '\n&') if url else 'None'
-#        print 'DATA:'
-#        print data.replace('&', '\n&') if data else 'None'
-#        print '------'
+        log.debug('REQUEST URL: %s' % url)
+        log.debug('REQUEST DATA: %s' % data)
 
         try:
             response = urllib2.urlopen(request)
         except urllib2.HTTPError, error:
-#            print error.read()
-            raise KayakoResponseError(error)
+            response_error = KayakoResponseError('%s: %s' % (error, error.read()))
+            log.error(response_error)
+            raise response_error
         except urllib2.URLError, error:
-#            print error.read()
-            raise KayakoRequestError(error)
+            request_error = KayakoRequestError(error)
+            log.error(request_error)
+            raise request_error
         return response
 
     ## { Persistence Layer

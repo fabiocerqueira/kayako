@@ -214,8 +214,10 @@ class Ticket(KayakoObject):
         try:
             response = api._request('%s/%s/' % (cls.controller, id), 'GET')
         except KayakoResponseError, error:
-            if len(error.args) and isinstance(error.args[0], (URLError, HTTPError)) and error.args[0].getcode() == 404:
+            if 'HTTP Error 404' in str(error):
                 return None
+            else:
+                raise
         tree = etree.parse(response)
         node = tree.find('ticket')
         if node is None:
@@ -367,8 +369,10 @@ class TicketAttachment(KayakoObject):
         try:
             response = api._request('%s/%s/%s/' % (cls.controller, ticketid, attachmentid), 'GET')
         except KayakoResponseError, error:
-            if len(error.args) and isinstance(error.args[0], (URLError, HTTPError)) and error.args[0].getcode() == 404:
+            if 'HTTP Error 404' in str(error):
                 return None
+            else:
+                raise
         tree = etree.parse(response)
         node = tree.find('attachment')
         if node is None:
@@ -662,8 +666,10 @@ class TicketPost(KayakoObject):
         try:
             response = api._request('%s/%s/%s/' % (cls.controller, ticketid, id), 'GET')
         except KayakoResponseError, error:
-            if len(error.args) and isinstance(error.args[0], (URLError, HTTPError)) and error.args[0].getcode() == 404:
+            if 'HTTP Error 404' in str(error):
                 return None
+            else:
+                raise
         tree = etree.parse(response)
         node = tree.find('post')
         if node is None:
