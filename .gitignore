@@ -1,0 +1,6 @@
+.project
+.pydevproject
+bin/
+include/
+kayako.egg-info/
+lib/
