@@ -61,7 +61,7 @@ class TestTicketType(KayakoAPITest):
     def test_get_all(self):
         from kayako.objects import TicketType
         result = self.api.get_all(TicketType)
-        #print result
+        self.log(result)
         assert isinstance(result, list)
 
     def test_get(self):

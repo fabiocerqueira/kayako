@@ -4,6 +4,7 @@
 #
 # Distributed under the terms of the Lesser GNU General Public License (LGPL)
 #-----------------------------------------------------------------------------
+
 '''
 Created on May 5, 2011
 
@@ -20,8 +21,11 @@ import urllib2
 import time
 from datetime import datetime
 
+from lxml import etree
+
 from kayako.exception import KayakoRequestError, KayakoResponseError, KayakoInitializationError
 from kayako.core.lib import FOREVER
+from kayako.objects.ticket import Ticket
 
 log = logging.getLogger('kayako')
 
@@ -419,6 +423,25 @@ class KayakoAPI(object):
 
 
         return object.get(self, *args)
+
+    def ticket_search(self, query, ticketid=False, contents=False, author=False, email=False, creatoremail=False, fullname=False, notes=False, usergroup=False, userorganization=False, user=False, tags=False):
+        ''' Search tickets in certain parameters for a given query.
+        query               The Search Query
+        ticketid=False      If True, then search the Ticket ID & Mask ID
+        contents=False      If True, then search the Ticket Post Contents
+        author=False        If True, then search the Full Name & Email
+        email=False         If True, then search the Email Address (Ticket & Posts)
+        creatoremail=False  If True, then search the Email Address (only Tickets)
+        fullname=False      If True, then search the Full Name
+        notes=False         If True, then search the Ticket Notes
+        usergroup=False     If True, then search the User Group
+        userorganization=False  If True, then search the User Organization
+        user=False          If True, then search the User (Full Name, Email)
+        tags=False          If True, then search the Ticket Tags
+        '''
+        response = self._request('/Tickets/TicketSearch', 'POST', query=query, ticketid=ticketid, contents=contents, author=author, email=email, creatoremail=creatoremail, fullname=fullname, notes=notes, usergroup=usergroup, userorganization=userorganization, user=user, tags=tags)
+        ticket_xml = etree.parse(response)
+        return [Ticket(self, **Ticket._parse_ticket(self, ticket_tree)) for ticket_tree in ticket_xml.findall('ticket')]
 
     def __str__(self):
         return '<KayakoAPI: %s>' % self.api_url

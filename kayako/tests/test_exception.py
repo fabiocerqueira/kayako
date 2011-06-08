@@ -10,9 +10,9 @@ Created on May 17, 2011
 @author: evan
 '''
 
-import unittest
+from kayako.tests import KayakoTest
 
-class TestException(unittest.TestCase):
+class TestException(KayakoTest):
 
     def test_KayakoError(self):
         from kayako.exception import KayakoError

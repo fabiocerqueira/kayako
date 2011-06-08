@@ -4,15 +4,16 @@
 #
 # Distributed under the terms of the Lesser GNU General Public License (LGPL)
 #-----------------------------------------------------------------------------
+
 '''
 Created on May 5, 2011
 
 @author: evan
 '''
 
-import unittest
+from kayako.tests import KayakoTest
 
-class TestKayakoObject(unittest.TestCase):
+class TestKayakoObject(KayakoTest):
 
     @property
     def api(self):

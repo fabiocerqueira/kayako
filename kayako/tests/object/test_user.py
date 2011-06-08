@@ -162,7 +162,7 @@ class TestUserGroup(KayakoAPITest):
     def test_get_nonexistant(self):
         from kayako.objects import UserGroup
         obj = self.api.get(UserGroup, '12345')
-        print obj
+        self.log(obj)
         assert obj is None
 
     def test_add_get(self):

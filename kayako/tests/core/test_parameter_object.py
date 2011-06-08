@@ -10,9 +10,9 @@ Created on May 9, 2011
 @author: evan
 '''
 
-import unittest
+from kayako.tests import KayakoTest
 
-class TestParameterObject(unittest.TestCase):
+class TestParameterObject(KayakoTest):
 
     def test_parameters(self):
         from kayako.core.lib import ParameterObject, UnsetParameter

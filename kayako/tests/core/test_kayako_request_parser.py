@@ -4,15 +4,16 @@
 #
 # Distributed under the terms of the Lesser GNU General Public License (LGPL)
 #-----------------------------------------------------------------------------
+
 '''
 Created on May 10, 2011
 
 @author: evan
 '''
 
-import unittest
+from kayako.tests import KayakoTest
 
-class TestKayakoRequestParser(unittest.TestCase):
+class TestKayakoRequestParser(KayakoTest):
 
     def _etree_with_data(self, data):
         from lxml import etree

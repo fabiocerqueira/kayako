@@ -99,10 +99,8 @@ Python API wrapper for Kayako 4.01.240
         ``api.get(TicketPost, ticketid, ticketpostid)``
             Return a ``TicketPost`` for a ticket with the given ``Ticket`` ID and
             TicketPost ID.
-            
-        
                 
-        ``api.get(TicketNote, ticketid, ticketnoteid)
+        ``api.get(TicketNote, ticketid, ticketnoteid)``
             Return a ``TicketNote`` for a ticket with the given ``Ticket`` ID and
             ``TicketNote`` ID.
             
@@ -125,7 +123,22 @@ These methods can raise exceptions:
     Raises ``KayakoResponseError`` if one of the following is true:
         - There is an error with the request (not HTTP 200 Ok)
         - The XML is in an unexpected format indicating a possible Kayako version mismatch (expects 4.01.204)
-    
+        
+**Misc API Calls**
+
+``api.ticket_search(query, ticketid=False, contents=False, author=False, email=False, creatoremail=False, fullname=False, notes=False, usergroup=False, userorganization=False, user=False, tags=False)``
+	*Search tickets with a query in the specified fields*
+        
+**Changes**
+
+	*1.1.4*
+	
+		- Requires Kayako 4.01.240, use 1.1.3 for Kayako 4.01.204
+		- TicketNote now supports get and delete
+		- Added api.ticket_search, see Misc API Calls for details.
+		- Refactored ticket module into ticket package. This could cause problems
+		  if things were not imported like ``from kayako.objects import X``
+
 **Quick Reference**
 
 ================= ====================================================================== ========================= ======= ======= =====================
@@ -136,7 +149,7 @@ Staff             Yes                                                           
 StaffGroup        Yes                                                                    Yes                       Yes     Yes     Yes
 Ticket            departmentid, ticketstatusid= -1, ownerstaffid= -1, userid= -1         Yes                       Yes     Yes     Yes
 TicketAttachment  ticketid                                                               ticketid, attachmentid    Yes     No      Yes
-TicketNote        ticketid                                                               No                        Yes     No      No (delete ticket)
+TicketNote        ticketid                                                               Yes                       Yes     No      Yes
 TicketPost        ticketid                                                               ticketid, postid          Yes     No      Yes
 TicketPriority    Yes                                                                    Yes                       No      No      No
 TicketStatus      Yes                                                                    Yes                       No      No      No

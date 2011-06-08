@@ -10,17 +10,48 @@ Created on May 5, 2011
 @author: evan
 '''
 
+import logging
 import unittest
 
 # TODO: Local testing
 
-class KayakoAPITest(unittest.TestCase):
+class KayakoTest(unittest.TestCase):
 
-    API_URL = ''
-    API_KEY = ''
-    SECRET_KEY = ''
+    LOG_NAME = 'kayako_test'
+
+    def log(self, *args, **kwargs):
+        log = logging.getLogger(KayakoTest.LOG_NAME)
+        log.debug(*args, **kwargs)
+
+    def setUp(self, *args, **kwargs):
+        log = logging.getLogger(KayakoTest.LOG_NAME)
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter('%(asctime)s KAYAKO-TEST  %(message)s')
+        handler.setFormatter(formatter)
+        log.addHandler(handler)
+        log.setLevel(logging.DEBUG)
+
+        unittest.TestCase.setUp(self, *args, **kwargs)
+
+
+class KayakoAPITest(KayakoTest):
+
+    API_URL = 'https://support.employeerewards.com/api/index.php'
+    API_KEY = '093dbd54-facc-72c4-d918-01abd19bfaa8'
+    SECRET_KEY = 'OTYzMmY2NDctMzU2ZC04NmI0LTg1NTYtZTNlZmVmYWRmYzc3ZTk0YzRjZmQtNTU1My1kMWU0LWJkNjMtZGM0NTI4ZmM5MjBl'
 
     @property
     def api(self):
         from kayako.api import KayakoAPI
         return KayakoAPI(self.API_URL, self.API_KEY, self.SECRET_KEY)
+
+    def setUp(self, *args, **kwargs):
+
+        log = logging.getLogger('kayako')
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter('%(asctime)-15s KAYAKO-%(levelname)-5s %(message)s')
+        handler.setFormatter(formatter)
+        log.addHandler(handler)
+        log.setLevel(logging.DEBUG)
+
+        return KayakoTest.setUp(self, *args, **kwargs)

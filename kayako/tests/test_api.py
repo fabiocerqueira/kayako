@@ -177,7 +177,7 @@ class TestKayakoAPI(KayakoAPITest):
         try:
             api._request('testing testing', 'GET')
         except KayakoRequestError, error:
-            print error
+            self.log(error)
             raised = True
         assert raised
 
