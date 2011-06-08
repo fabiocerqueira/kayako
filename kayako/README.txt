@@ -1,4 +1,4 @@
-Python API wrapper for Kayako 4.01.204
+Python API wrapper for Kayako 4.01.240
 --------------------------------------
     
 **Usage:**

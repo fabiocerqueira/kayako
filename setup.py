@@ -12,8 +12,8 @@ with open('kayako/README.txt') as readme:
 
 setup(
     name='kayako',
-    version='1.1.3',
-    description="Python API Wrapper for Kayako 4.01.204",
+    version='1.1.4',
+    description="Python API Wrapper for Kayako 4.01.240",
     long_description=long_description,
     author='Evan Leis',
     author_email='engineergod@yahoo.com',

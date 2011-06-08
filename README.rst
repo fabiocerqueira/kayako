@@ -1,4 +1,4 @@
-Python API wrapper for Kayako 4.01.204
+Python API wrapper for Kayako 4.01.240
 --------------------------------------
     
 **Usage:**
@@ -92,13 +92,19 @@ Python API wrapper for Kayako 4.01.204
     *Special Cases:*
         
         ``api.get(TicketAttachment, ticketid, attachmentid)``
-            Return a ``TicketAttachment`` for a ``Ticket`` with the given Ticket
+            Return a ``TicketAttachment`` for a ``Ticket`` with the given ``Ticket``
             ID and TicketAttachment ID.  Getting a specific ``TicketAttachment``
             gets a ``TicketAttachment`` with the actual attachment contents.
         
         ``api.get(TicketPost, ticketid, ticketpostid)``
-            Return a ``TicketPost`` for a ticket with the given Ticket ID and
+            Return a ``TicketPost`` for a ticket with the given ``Ticket`` ID and
             TicketPost ID.
+            
+        
+                
+        ``api.get(TicketNote, ticketid, ticketnoteid)
+            Return a ``TicketNote`` for a ticket with the given ``Ticket`` ID and
+            ``TicketNote`` ID.
             
 **Object persistence methods**
 

@@ -410,6 +410,10 @@ class KayakoAPI(object):
             api.get(TicketPost, ticketid, ticketpostid)
                 Return a TicketPost for a ticket with the given Ticket ID and
                 TicketPost ID.
+                
+            api.get(TicketNote, ticketid, ticketnoteid)
+                Return a TicketNote for a ticket with the given Ticket ID and
+                TicketNote ID.
         
         '''
 

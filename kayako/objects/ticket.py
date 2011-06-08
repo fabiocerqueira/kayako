@@ -457,6 +457,7 @@ class TicketNote(KayakoObject):
     @classmethod
     def _parse_ticket_note(cls, ticket_note_tree, ticketid):
         params = dict(
+            id = cls._parse_int(ticket_note_tree.get('id')),
             ticketid=ticketid,
             contents=ticket_note_tree.text,
             staffid=cls._parse_int(ticket_note_tree.get('staffid'), required=False),
@@ -499,15 +500,15 @@ class TicketNote(KayakoObject):
         tree = etree.parse(response)
         return [TicketNote(api, **cls._parse_ticket_note(ticket_note_tree, ticketid)) for ticket_note_tree in tree.findall('note')]
 
-#    @classmethod
-#    def get(cls, api, ticketid, id):
-#        response = api._request('%s/%s/%s/' % (cls.controller, ticketid, id), 'GET')
-#        tree = etree.parse(response)
-#        node = tree.find('note')
-#        if node is None:
-#            return None
-#        params = cls._parse_ticket_note(node, ticketid)
-#        return TicketNote(api, **params)
+    @classmethod
+    def get(cls, api, ticketid, id):
+        response = api._request('%s/%s/%s/' % (cls.controller, ticketid, id), 'GET')
+        tree = etree.parse(response)
+        node = tree.find('note')
+        if node is None:
+            return None
+        params = cls._parse_ticket_note(node, ticketid)
+        return TicketNote(api, **params)
 
     def add(self):
         '''
@@ -540,10 +541,12 @@ class TicketNote(KayakoObject):
         node = tree.find('note')
         self._update_from_response(node)
 
-#    def delete(self):
-#        if self.ticketid is None or self.ticketid is UnsetParameter:
-#            raise KayakoRequestError('Cannot delete a TicketNote without being attached to a ticket. The ID of the Ticket (ticketid) has not been specified.')
-#        self._delete('%s/%s/%s/' % (self.controller, self.ticketid, self.id))
+    def delete(self):
+        if not self.id:
+            raise KayakoRequestError('Cannot delete a TicketNote without being attached to a ticket. The ID of the TicketNote (id) has not been specified.')
+        if not self.ticketid:
+            raise KayakoRequestError('Cannot delete a TicketNote without being attached to a ticket. The ID of the Ticket (ticketid) has not been specified.')
+        self._delete('%s/%s/%s/' % (self.controller, self.ticketid, self.id))
 
     def __str__(self):
         return '<TicketNote (%s): %s>' % (self.id, self.contents[:20])
