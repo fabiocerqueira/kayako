@@ -36,11 +36,11 @@ Python API wrapper for Kayako 4.01.240
 
 ``api.create(Object, *args, **kwargs)``
 
-    Create and return a new KayakoObject of the type given passing in args and kwargs.
+    Create and return a new ``KayakoObject`` of the type given passing in args and kwargs.
     
 ``api.get_all(Object, *args, **kwargs)``
 
-    *Get all Kayako Objects of the given type.*
+    *Get all ``KayakoObjects`` of the given type.*
     *In most cases, all items are returned.*
     
     e.x. ::
@@ -51,41 +51,47 @@ Python API wrapper for Kayako 4.01.240
     *Special Cases:*
     
         ``api.get_all(User, marker=1, maxitems=1000)``
-            Return all Users from userid ``marker`` with up to ``maxitems`` 
+            Return all ``Users`` from userid ``marker`` with up to ``maxitems`` 
             results (max 1000.)
             
         ``api.get_all(Ticket, departmentid, ticketstatusid=-1, ownerstaffid=-1, userid=-1)``
-            Return all Tickets filtered by the required argument 
+            Return all ``Tickets`` filtered by the required argument 
             ``departmentid`` and by the optional keyword arguments.
             
         ``api.get_all(TicketAttachment, ticketid)``
-            Return all TicketAttachments for a Ticket with the given ID.
+            Return all ``TicketAttachments`` for a ``Ticket`` with the given ID.
             
         ``api.get_all(TicketPost, ticketid)``
-            Return all TicketPosts for a Ticket with the given ID.
+            Return all ``TicketPosts`` for a ``Ticket`` with the given ID.
+            
+        ``api.get_all(TicketCustomField, ticketid)``
+        	Return all ``TicketCustomFieldGroups`` for a ``Ticket`` with the given ID.
+        	Returns a ``list`` of ``TicketCustomFieldGroups``.
 
 ``api.filter(Object, args=(), kwargs={}, **filter)``
 
-	Gets all KayakoObjects matching a filter.
+	Gets all ``KayakoObjects`` matching a filter.
         
-        e.x.
+        e.x. ::
+
             >>> api.filter(Department, args=(2), module='tickets')
             [<Department module='tickets'...>, <Department module='tickets'...>, ...]
             
 ``api.first(Object, args=(), kwargs={}, **filter)``
 
-	Returns the first KayakoObject found matching a given filter.
+	Returns the first ``KayakoObject`` found matching a given filter.
         
-        e.x.
+        e.x. ::
+
             >>> api.filter(Department, args=(2), module='tickets')
             <Department module='tickets'>
 
 ``api.get(Object, *args)``
 
-    *Get a Kayako Object of the given type by ID.*
+    *Get a ``KayakoObject`` of the given type by ID.*
     
     e.x. ::
-    
+
         >>> api.get(User, 112359)
         <User (112359)....>
     
@@ -93,12 +99,12 @@ Python API wrapper for Kayako 4.01.240
         
         ``api.get(TicketAttachment, ticketid, attachmentid)``
             Return a ``TicketAttachment`` for a ``Ticket`` with the given ``Ticket``
-            ID and TicketAttachment ID.  Getting a specific ``TicketAttachment``
+            ID and ``TicketAttachment`` ID.  Getting a specific ``TicketAttachment``
             gets a ``TicketAttachment`` with the actual attachment contents.
         
         ``api.get(TicketPost, ticketid, ticketpostid)``
             Return a ``TicketPost`` for a ticket with the given ``Ticket`` ID and
-            TicketPost ID.
+            ``TicketPost`` ID.
                 
         ``api.get(TicketNote, ticketid, ticketnoteid)``
             Return a ``TicketNote`` for a ticket with the given ``Ticket`` ID and
@@ -149,6 +155,7 @@ Staff             Yes                                                           
 StaffGroup        Yes                                                                    Yes                       Yes     Yes     Yes
 Ticket            departmentid, ticketstatusid= -1, ownerstaffid= -1, userid= -1         Yes                       Yes     Yes     Yes
 TicketAttachment  ticketid                                                               ticketid, attachmentid    Yes     No      Yes
+TicketCustomField ticketid                                                               No                        No      No      No
 TicketNote        ticketid                                                               Yes                       Yes     No      Yes
 TicketPost        ticketid                                                               ticketid, postid          Yes     No      Yes
 TicketPriority    Yes                                                                    Yes                       No      No      No
