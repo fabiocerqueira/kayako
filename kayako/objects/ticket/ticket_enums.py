@@ -12,9 +12,7 @@ Created on Jun 8, 2011
 
 from lxml import etree
 
-from kayako.core.lib import UnsetParameter
 from kayako.core.object import KayakoObject
-from kayako.exception import KayakoRequestError, KayakoResponseError
 
 class TicketPriority(KayakoObject):
     '''

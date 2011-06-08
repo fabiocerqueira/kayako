@@ -116,9 +116,14 @@ class TicketCustomField(KayakoObject):
         Required:
             ticketid     The unique numeric identifier of the ticket. 
         '''
-        response = api._request('%s/%s' % (cls.controller, ticketid), 'GET')
+        try:
+            response = api._request('%s/%s' % (cls.controller, ticketid), 'GET')
+        except KayakoResponseError, error:
+            if 'HTTP Error 404' in str(error):
+                return None
+            else:
+                raise
         tree = etree.parse(response)
-
         groups = []
         for group_tree in tree.findall('group'):
             fields = [TicketCustomField(api, **cls._parse_ticket_custom_field(custom_field)) for custom_field in group_tree.findall('field')]
@@ -126,40 +131,12 @@ class TicketCustomField(KayakoObject):
             groups.append(ticket_group)
         return groups
 
-
-    def add(self):
-        '''
-        Add this TicketPost.
-        
-        Requires:
-            ticketid  The unique numeric identifier of the ticket.
-            subject   The ticket post subject
-            contents  The ticket post contents
-        Requires one of:
-            userid    The User ID, if the ticket post is to be created as a user.
-            staffid   The Staff ID, if the ticket post is to be created as a staff 
-        '''
-        if self.id is not UnsetParameter:
-            raise KayakoRequestError('Cannot add a pre-existing %s. Use save instead. (id: %s)' % (self.__class__.__name__, self.id))
-
-        parameters = self.add_parameters
-
-        for required_parameter in self.__required_add_parameters__:
-            if required_parameter not in parameters:
-                raise KayakoRequestError('Cannot add %s: Missing required field: %s.' % (self.__class__.__name__, required_parameter))
-
-        if ('userid' not in parameters and 'staffid' not in parameters) or ('userid' in parameters and 'staffid' in parameters):
-            raise KayakoRequestError('To add a TicketPost, just one of the following parameters must be set: userid, staffid. (id: %s)' % self.id)
-
-        response = self.api._request(self.controller, 'POST', **parameters)
-        tree = etree.parse(response)
-        node = tree.find('post')
-        self._update_from_response(node)
-
-    def delete(self):
-        if self.ticketid is None or self.ticketid is UnsetParameter:
-            raise KayakoRequestError('Cannot delete a TicketPost without being attached to a ticket. The ID of the Ticket (ticketid) has not been specified.')
-        self._delete('%s/%s/%s/' % (self.controller, self.ticketid, self.id))
+    @property
+    def short_value(self):
+        value = str(self.value)
+        if len(value) > 20:
+            return '%s...' % value[:20]
+        return value
 
     def __str__(self):
-        return '<TicketPost (%s): %s>' % (self.id, self.subject)
+        return '<TicketCustomField (%s): %s %s>' % (self.id, self.type, self.short_value)
