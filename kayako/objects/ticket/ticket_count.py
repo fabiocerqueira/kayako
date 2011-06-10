@@ -40,10 +40,10 @@ class TicketCountItem(KayakoObject):
 
     @classmethod
     def _from_node(cls, node):
-        return TicketCountTicketStatus(cls._parse_int(node.get('id')), cls._parse_date(node.get('lastactivity')), cls._parse_int(node.get('totalitems')), totalunresolveditems=cls._parse_int(node.get('totalunresolveditems'), required=False))
+        return cls(cls._parse_int(node.get('id')), cls._parse_date(node.get('lastactivity')), cls._parse_int(node.get('totalitems')), totalunresolveditems=cls._parse_int(node.get('totalunresolveditems'), required=False))
 
     def __str__(self):
-        return '<%s (%s): totalitems=%s lastactivity=%s%s>' % (self.__class__.___name__, self.id, self.totalitems, self.lastactivity, ' totalunresolveditems=%s' % self.totalunresolveditems if self.totalunresolveditems is not None else '')
+        return '<%s (%s): totalitems=%s lastactivity=%s%s>' % (self.__class__.__name__, self.id, self.totalitems, self.lastactivity, ' totalunresolveditems=%s' % self.totalunresolveditems if self.totalunresolveditems is not None else '')
 
 class TicketCountTicketStatus(TicketCountItem):
     pass
@@ -90,6 +90,9 @@ class TicketCountDepartment(KayakoObject):
         )
 
         return TicketCountDepartment(None, **params)
+
+    def __str__(self):
+        return '<TicketCountDepartment (%s): totalitems:%s, lastactivity:%s, totalunresolveditems:%s, statuses:%s, types:%s, staff:%s>' % (self.id, self.totalitems, self.lastactivity, self.totalunresolveditems, len(self.statuses), len(self.types), len(self.staff))
 
 class TicketCount(KayakoObject):
     '''
