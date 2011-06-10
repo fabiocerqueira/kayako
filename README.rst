@@ -255,7 +255,7 @@ These methods can raise exceptions:
         
     Raises ``KayakoResponseError`` if one of the following is true:
         - There is an error with the request (not HTTP 200 Ok)
-        - The XML is in an unexpected format indicating a possible Kayako version mismatch (expects 4.01.204)
+        - The XML is in an unexpected format indicating a possible Kayako version mismatch
         
 **Misc API Calls**
 
