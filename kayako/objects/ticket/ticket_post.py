@@ -67,7 +67,7 @@ class TicketPost(KayakoObject):
     def _parse_ticket_post(cls, ticket_post_tree, ticket_id):
 
         params = dict(
-            id=cls._get_int(ticket_post_tree.find('ticketpostid')), # Note different names
+            id=cls._get_int(ticket_post_tree.find('id')),
             ticketid=ticket_id,
             subject=cls._get_string(ticket_post_tree.find('subject')),
             contents=cls._get_string(ticket_post_tree.find('contents')),
@@ -89,7 +89,7 @@ class TicketPost(KayakoObject):
 
     def _update_from_response(self, ticket_post_tree):
 
-        ticketpostid_node = ticket_post_tree.find('ticketpostid')
+        ticketpostid_node = ticket_post_tree.find('id')
         if ticketpostid_node is not None:
             self.id = self._get_int(ticketpostid_node)
 
