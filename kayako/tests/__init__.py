@@ -40,7 +40,7 @@ class KayakoTest(unittest.TestCase):
 
 class KayakoAPITest(KayakoTest):
 
-    API_URL = 'https://support.employeerewards.com/api/index.php'
+    API_URL = ''
     API_KEY = ''
     SECRET_KEY = ''
 
