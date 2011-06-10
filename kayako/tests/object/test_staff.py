@@ -20,6 +20,7 @@ class TestStaff(KayakoAPITest):
         test_staff = api.filter(Staff, email=self.EMAIL)
         for staff in test_staff:
             staff.delete()
+        super(TestStaff, self).tearDown()
 
     def test_add_get_nonexistant(self):
         from kayako.objects import Staff
@@ -173,6 +174,7 @@ class TestStaffGroup(KayakoAPITest):
         for group in all_groups:
             if group.title == 'DELETEME' or group.title == 'DELETEME2':
                 group.delete()
+        super(TestStaffGroup, self).tearDown()
 
     def test_add_get_nonexistant(self):
         from kayako.objects import StaffGroup

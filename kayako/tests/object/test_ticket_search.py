@@ -22,6 +22,7 @@ class TestTicketSearch(KayakoAPITest):
         test_tickets = self.api.filter(Ticket, args=(dept.id,), subject=self.SUBJECT)
         for ticket in test_tickets:
             ticket.delete()
+        super(TestTicketSearch, self).tearDown()
 
     def test_search_all(self):
         from kayako.objects import Department, Ticket

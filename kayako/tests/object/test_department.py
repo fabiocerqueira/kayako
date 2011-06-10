@@ -22,6 +22,7 @@ class TestDepartment(KayakoAPITest):
         for department in all_departments:
             if department.title == self.TITLE or department.title == self.TITLE2:
                 department.delete()
+        super(TestDepartment, self).tearDown()
 
     def test_get_nonexistant(self):
         from kayako.objects import Department

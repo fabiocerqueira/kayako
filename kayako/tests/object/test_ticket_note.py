@@ -22,6 +22,7 @@ class TestTicketNote(KayakoAPITest):
         test_tickets = self.api.filter(Ticket, args=(dept.id,), subject=self.SUBJECT)
         for ticket in test_tickets:
             ticket.delete()
+        super(TestTicketNote, self).tearDown()
 
     def test_get_nonexistant(self):
         from kayako.objects import Department, Ticket, TicketNote

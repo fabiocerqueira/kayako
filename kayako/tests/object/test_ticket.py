@@ -23,6 +23,7 @@ class TestTicket(KayakoAPITest):
         for ticket in all_tickets:
             if ticket.subject == self.SUBJECT or ticket.subject == self.SUBJECT2:
                 ticket.delete()
+        super(TestTicket, self).tearDown()
 
     def test_get_nonexistant(self):
         from kayako.objects import Ticket

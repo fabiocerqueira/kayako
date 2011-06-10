@@ -22,6 +22,7 @@ class TestUser(KayakoAPITest):
         for user in all_users:
             if user.fullname == self.FULLNAME or user.fullname == self.FULLNAME2:
                 user.delete()
+        super(TestUser, self).tearDown()
 
     def test_get_nonexistant(self):
         from kayako.objects import User
@@ -158,6 +159,7 @@ class TestUserGroup(KayakoAPITest):
         for usergroup in all_usergroups:
             if usergroup.title == self.TITLE or usergroup.title == self.TITLE2:
                 usergroup.delete()
+        super(TestUserGroup, self).tearDown()
 
     def test_get_nonexistant(self):
         from kayako.objects import UserGroup
@@ -241,6 +243,7 @@ class TestUserOrganization(KayakoAPITest):
         for userorg in all_userorgs:
             if userorg.name == self.NAME or userorg.name == self.NAME2:
                 userorg.delete()
+        super(TestUserOrganization, self).tearDown()
 
     def test_get_nonexistant(self):
         from kayako.objects import UserOrganization
