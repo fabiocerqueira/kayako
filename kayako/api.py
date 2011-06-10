@@ -36,34 +36,158 @@ class KayakoAPI(object):
         
     **Usage:**
     
-    ::
+    Set up the API::
     
-        >>> from kayako import KayakoAPI, User, Ticket, Department, UnsetParameter
-        >>> api = KayakoAPI('http://kayako.foo.com/api/index.php', 's8v092-2lksd-9cso-c2', 'somesecret')
-        >>> departments = api.get_all(Department)
-        >>> for department in departments:
-        >>>     # Print every ticket in every department
-        >>>     tickets = api.get_all(Ticket, department.id)
-        >>>     for ticket in tickets:
-        >>>         print department, ticket
-        <Department...> <Ticket...>
-        <Department...> <Ticket...>
-        <Department...> <Ticket...>
+        >>> from kayako import KayakoAPI, 
+        >>> API_URL = 'http://example.com/api/index.php'
+        >>> API_KEY = 'abc3r4f-alskcv3-kvj4'
+        >>> SECRET_KEY = 'vkl239vLKMNvlik42fv9IsflkFJlkckfjs'
+        >>> api = KayakoAPI(API_URL, API_KEY, SECRET_KEY)
+    
+    Add a department::
         
-    **Add an object**
+        >>> from kayako import Department
+        >>>
+        >>> # The following is equivalent to: department = api.create(Department, title='Customer Support Department', type='public', module='tickets'); department.add()
+        >>> department = api.create(Department)
+        >>> department.title = 'Customer Support Department'
+        >>> department.type = 'public'
+        >>> department.module = 'tickets'
+        >>> department.add()
+        >>> department.id
+        84
+        >>>
+        >>> # Cool, we now have a ticket department.
+        >>> # Lets say we want to make it private now
+        >>>
+        >>> department.type = 'private'
+        >>> department.save()
+        >>>
+        >>> # Ok, great.  Lets delete this test object.
+        >>>
+        >>> department.delete()
+        >>> department.id
+        UnsetParameter()
+        >>>
+        >>> # We can re-add it if we want to...
+        >>>
+        >>> department.save()
+        >>> department.id
+        85
+        >>>
+        >>> # Lets see all of our Departments (yours will vary.)
+        >>> for dept in api.get_all(Department):
+        ...     print dept
+        ... 
+        <Department (1): General/tickets>
+        <Department (2): Suggest A Store/tickets>
+        <Department (3): Report A Bug/tickets>
+        <Department (4): Sales/livechat>
+        <Department (5): Commissions/livechat>
+        <Department (6): Missing Order/livechat>
+        <Department (7): Suggest A Feature/tickets>
+        <Department (8): Other/livechat>
+        <Department (49): Offers/tickets>
+        <Department (85): Customer Support Department/tickets>
+        >>>
+        >>> # Lets see all of our ticket Departments
+        >>>
+        >>> for dept in api.filter(Department, module='tickets')
+        >>>    print dept
+        <Department (1): General/tickets>
+        <Department (2): Suggest A Store/tickets>
+        <Department (3): Report A Bug/tickets>
+        <Department (7): Suggest A Feature/tickets>
+        <Department (49): Offers/tickets>
+        <Department (85): Customer Support Department/tickets>
+        >>>
+        >>> # We will use this Department in the next example so lets wait to clean up the test data...
+        >>> #department.delete()
     
-    ::
+    Add a Staff member::
     
-        department = api.create(Department)
-        department.title = 'Food Department' # Department author was hungry
-        department.module = 'tickets'
-        department.type = 'private'
-        assert department.id is UnsetParameter
-        department.add()
-        assert department.id is not UnsetParameter
-        department.title = 'Foo Department' # 'Food' was supposed to be 'Foo'
-        department.save()
-        department.delete()
+        >>> from kayako import Staff, StaffGroup
+        >>>
+        >>> # You can set parameters in the create method.
+        >>> staff = api.create(Staff, firstname='John', lastname='Doe', email='foo@example.com', username='explodes', password='easypass332') 
+        >>>
+        >>> # We need to add a Staff member to a staff group.
+        >>> # Lets get the first StaffGroup titled "Administrator"
+        >>>
+        >>> admin_group = api.first(StaffGroup, title="Administrator")
+        >>> staff.staffgroupid = admin_group.id
+        >>>
+        >>> # And save the new Staff
+        >>>
+        >>> staff.add()
+        >>>
+        >>> # We will use this Staff in the next example so lets wait to clean up the test data...
+        >>> #staff.delete()
+        
+    Add a User::
+    
+        >>> from kayako import User, UserGroup, FOREVER
+        >>>
+        >>> # What fields can we add to this User?
+        >>> User.__add_parameters__
+        ['fullname', 'usergroupid', 'password', 'email', 'userorganizationid', 'salutation', 'designation', 'phone', 'isenabled', 'userrole', 'timezone', 'enabledst', 'slaplanid', 'slaplanexpiry', 'userexpiry', 'sendwelcomeemail']
+        >>>
+        >>> # Lets make a new User, but not send out a welcome email.
+        >>> # Lets add the User to the "Registered" user group.
+        >>> registered = api.first(UserGroup, title='Registered')
+        >>> user = api.create(User, fullname="Ang Gary", password="easypass332", email="bar@example.com", usergroupid=registered.id, sendwelcomeemail=False, phone='1-800-555-5555', userexpiry=FOREVER)
+        >>> user.add()
+        >>>
+        >>> # Its that easy.  We will use this user in the next example so lets wait to clean up the test data...
+        >>> # user.delete()
+        
+    Add a Ticket and a TicketNote::
+    
+        >>> from kayako import TicketStatus, TicketPriority
+        >>>
+        >>> # Lets add a "Bug" Ticket to any Ticket Department, with "Open" status and "High" priority for a user. Lets use the user and department from above.
+        >>>
+        >>> bug = api.first(TicketType, title="Bug")
+        >>> open = api.first(TicketStatus, title="Open")
+        >>> high = api.first(TicketPriority, title="High")
+        >>>
+        >>> ticket = api.create(Ticket, tickettypeid=bug.id, ticketstatusid=open.id, ticketpriorityid=high.id, departmentid=department.id, userid=user.id)
+        >>> ticket.subject = 'I found a bug and its making me very angry.'
+        >>> ticket.fullname = 'Ang Gary'
+        >>> ticket.email = 'bar@example.com'
+        >>> ticket.contents = 'I am an angry customer you need to make me happy.'
+        >>> ticket.add()
+        >>>
+        >>> # The ticket was added, lets let the customer know that everything will be fine.
+        >>>
+        >>> print 'Thanks, %s, your inquiry with reference number %s will be answered shortly.' % (ticket.fullname, ticket.displayid)
+        Thanks, Ang Gary, your inquiry with reference number TOJ-838-99722 will be answered shortly.'
+        >>>
+        >>> # Lets add a note to this Ticket, using the Staff member we created above.
+        >>>
+        >>> note = api.create(TicketNote, ticketid=ticket.id, contents='Customer was hostile. Will pursue anyway as this bug is serious.')
+        >>> note.staffid = staff.id # Alternatively, we could do: staff.fullname = 'John Doe'
+        >>> note.add()
+        >>>
+        >>> # Lets say the bug is fixed, we want to let the User know.
+        >>>
+        >>> post = api.create(TicketPost, ticketid=ticket.id, subject="We fixed it.", contents="We have a patch that will fix the bug.")
+        >>> post.add()
+        >>>
+        >>> # Now lets add an attachment to this TicketPost.
+        >>>
+        >>> with open('/var/patches/foo.diff', 'rb') as patch:
+        ...    binary_data = patch.read()
+        >>>
+        >>> attachment = api.create(TicketAttachment, ticketid=ticket.id, ticketpostid=post.id, filename='foo.diff', filetype='application/octet-stream')
+        >>> attachment.set_contents(binary_data) # set_contents encodes data into base 64. get_contents decodes base64 contents into the original data.
+        >>> attachment.add()
+        >>>
+        >>> # Lets clean up finally.
+        >>> ticket.delete() # This deletes the attachment, post, and note.
+        >>> user.delete()
+        >>> staff.delete()
+        >>> department.delete()
     
     **API Factory Methods:**
     
@@ -171,6 +295,21 @@ class KayakoAPI(object):
     ``api.ticket_search(query, ticketid=False, contents=False, author=False, email=False, creatoremail=False, fullname=False, notes=False, usergroup=False, userorganization=False, user=False, tags=False)``
         *Search tickets with a query in the specified fields*
             
+    **Changes**
+    
+        *1.1.4*
+        
+            - Requires Kayako 4.01.240, use 1.1.3 for Kayako 4.01.204
+            - ``TicketNote`` now supports get and delete
+            - Added ``api.ticket_search``, see Misc API Calls for details.
+            - Refactored ticket module into ticket package. This could cause problems
+              if things were not imported like ``from kayako.objects import X``
+            - Added ``TicketCount`` object. Use ``api.get_all(TicketCount)`` to
+              retrieve.
+            - Added ``TicketTimeTrack`` object. ``api.get_all(TicketTimeTrack, ticket.id)`` or
+              ``api.get(TicketTimeTrack, ticket.id, ticket_time_track_id)``
+            - Added ``Ticket.timetracks``
+    
     **Quick Reference**
     
     ================= ====================================================================== ========================= ======= ======= =====================
