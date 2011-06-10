@@ -44,16 +44,6 @@ class TicketPriority(KayakoObject):
         'usergroupid',
     ]
 
-    __required_add_parameters__ = []
-    ''' Add not available for TicketPriority. '''
-    __add_parameters__ = []
-    ''' Add not available for TicketPriority. '''
-
-    __required_save_parameters__ = []
-    ''' Save not available for TicketPriority. '''
-    __save_parameters__ = []
-    ''' Save not available for TicketPriority. '''
-
     @classmethod
     def _parse_ticket_priority(cls, ticket_priority_tree):
 
@@ -129,16 +119,6 @@ class TicketStatus(KayakoObject):
         'staffvisibilitycustom',
     ]
 
-    __required_add_parameters__ = []
-    ''' Add not available for TicketStatus. '''
-    __add_parameters__ = []
-    ''' Add not available for TicketStatus. '''
-
-    __required_save_parameters__ = []
-    ''' Save not available for TicketStatus. '''
-    __save_parameters__ = []
-    ''' Save not available for TicketStatus. '''
-
     @classmethod
     def _parse_ticket_status(cls, ticket_status_tree):
 
@@ -204,16 +184,6 @@ class TicketType(KayakoObject):
         'type',
         'uservisibilitycustom',
     ]
-
-    __required_add_parameters__ = []
-    ''' Add not available for TicketType. '''
-    __add_parameters__ = []
-    ''' Add not available for TicketType. '''
-
-    __required_save_parameters__ = []
-    ''' Save not available for TicketType. '''
-    __save_parameters__ = []
-    ''' Save not available for TicketType. '''
 
     @classmethod
     def _parse_ticket_type(cls, ticket_type_tree):

@@ -95,16 +95,6 @@ class TicketCustomField(KayakoObject):
         'value',
     ]
 
-    __required_add_parameters__ = []
-    ''' Add not available for TicketCustomField. '''
-    __add_parameters__ = []
-    ''' Add not available for TicketCustomField. '''
-
-    __required_save_parameters__ = []
-    ''' Save not available for TicketCustomField. '''
-    __save_parameters__ = []
-    ''' Save not available for TicketCustomField. '''
-
     controller = '/Tickets/TicketCustomField'
 
     @classmethod

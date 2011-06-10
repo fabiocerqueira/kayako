@@ -61,11 +61,6 @@ class TicketPost(KayakoObject):
     __required_add_parameters__ = ['ticketid', 'subject', 'contents']
     __add_parameters__ = ['ticketid', 'subject', 'contents', 'userid', 'staffid']
 
-    __required_save_parameters__ = []
-    ''' Save not available for TicketNote. '''
-    __save_parameters__ = []
-    ''' Save not available for TicketNote. '''
-
     controller = '/Tickets/TicketPost'
 
     @classmethod

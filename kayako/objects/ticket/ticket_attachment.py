@@ -45,12 +45,6 @@ class TicketAttachment(KayakoObject):
     __required_add_parameters__ = ['ticketid', 'ticketpostid', 'filename', 'contents']
     __add_parameters__ = ['ticketid', 'ticketpostid', 'filename', 'contents']
 
-    __required_save_parameters__ = []
-    ''' Save not available for TicketAttachment. '''
-    __save_parameters__ = []
-    ''' Save not available for TicketAttachment. '''
-
-
     @classmethod
     def _parse_ticket_attachment(cls, ticket_attachment_tree):
 

@@ -47,11 +47,6 @@ class TicketNote(KayakoObject):
     __required_add_parameters__ = ['ticketid', 'contents']
     __add_parameters__ = ['ticketid', 'contents', 'staffid', 'fullname', 'forstaffid', 'notecolor']
 
-    __required_save_parameters__ = []
-    ''' Save not available for TicketNote. '''
-    __save_parameters__ = []
-    ''' Save not available for TicketNote. '''
-
     @classmethod
     def _parse_ticket_note(cls, ticket_note_tree, ticketid):
         id = cls._parse_int(ticket_note_tree.get('id'))
