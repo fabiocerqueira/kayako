@@ -105,9 +105,14 @@ class TicketCount(KayakoObject):
 
     __parameters__ = ['departments', 'statuses', 'staff', 'unassigned']
 
+    def __init__(self, departments, statuses, staff, unassigned):
+        self.departments = departments
+        self.statuses = statuses
+        self.staff = staff
+        self.unassigned = unassigned
 
     @classmethod
-    def _parse_ticket_count(cls, api, tree):
+    def _parse_ticket_count(cls, tree):
 
         departments = tuple()
         parent = tree.find('departments')
@@ -146,7 +151,7 @@ class TicketCount(KayakoObject):
     def get_all(cls, api):
         response = api._request(cls.controller, 'GET')
         tree = etree.parse(response)
-        return TicketCount(api, **cls._parse_ticket_count(api, tree))
+        return TicketCount(**cls._parse_ticket_count(tree))
 
     def __str__(self):
         return '<TicketCount: departments:%s, statuses:%s, staff:%s, unassigned:%s>' % (len(self.departments), len(self.statuses), len(self.staff), len(self.unassigned))
