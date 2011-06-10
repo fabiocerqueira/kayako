@@ -149,6 +149,9 @@ These methods can raise exceptions:
 		  if things were not imported like ``from kayako.objects import X``
 		- Added ``TicketCount`` object. Use ``api.get_all(TicketCount)`` to
 		  retrieve.
+		- Added ``TicketTimeTrack`` object. ``api.get_all(TicketTimeTrack, ticket.id)`` or
+		  ``api.get(TicketTimeTrack, ticket.id, ticket_time_track_id)``
+		- Added ``Ticket.timetracks``
 
 **Quick Reference**
 
@@ -166,6 +169,7 @@ TicketNote        ticketid                                                      
 TicketPost        ticketid                                                               ticketid, postid          Yes     No      Yes
 TicketPriority    Yes                                                                    Yes                       No      No      No
 TicketStatus      Yes                                                                    Yes                       No      No      No
+TicketTimeTrack   ticketid                                                               ticketid, id              Yes     No      Yes
 TicketType        Yes                                                                    Yes                       No      No      No
 User              marker=1, maxitems=1000                                                Yes                       Yes     Yes     Yes
 UserGroup         Yes                                                                    Yes                       Yes     Yes     Yes

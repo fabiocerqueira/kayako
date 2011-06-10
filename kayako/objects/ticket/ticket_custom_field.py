@@ -130,7 +130,6 @@ class TicketCustomField(KayakoObject):
             response = '\n'.join(response.split('\n')[1:])
 
         tree = etree.fromstring(response)
-        etree.tostring(tree, pretty_print=True)
 
         groups = []
         for group_tree in tree.findall('group'):
