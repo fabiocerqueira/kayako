@@ -9,12 +9,10 @@ Created on Jun 8, 2011
 
 @author: evan
 '''
-
 from lxml import etree
 
-from kayako.core.lib import UnsetParameter
 from kayako.core.object import KayakoObject
-from kayako.exception import KayakoRequestError, KayakoResponseError
+from kayako.exception import KayakoResponseError
 
 __all__ = [
    'CustomFieldTypes',
@@ -61,12 +59,24 @@ class CustomFieldTypes(object):
     def name_by_id(cls, id):
         return cls.TYPES.get(id, None)
 
-class TicketCustomFieldGroup(object):
+class TicketCustomFieldGroup(KayakoObject):
+    '''
+    Kayako TicketCustomFieldGroup API Object.
+    
+    id
+    title
+    fields
+    '''
+
+    __parameters__ = ['id', 'title', 'fields']
 
     def __init__(self, id, title, fields):
         self.id = id
         self.title = title
         self.fields = fields
+
+    def __str__(self):
+        return '<TicketCustomFieldGroup (%s): %s (%s field%s)>' % (self.id, self.title, len(self.fields) if self.fields else 0, '' if self.fields and len(self.fields) == 1 else 's')
 
 class TicketCustomField(KayakoObject):
     '''
@@ -123,11 +133,19 @@ class TicketCustomField(KayakoObject):
                 return None
             else:
                 raise
-        tree = etree.parse(response)
+
+        # Strip possible error text.
+        response = response.read()
+        if response.startswith('<div'):
+            response = '\n'.join(response.split('\n')[1:])
+
+        tree = etree.fromstring(response)
+        etree.tostring(tree, pretty_print=True)
+
         groups = []
         for group_tree in tree.findall('group'):
-            fields = [TicketCustomField(api, **cls._parse_ticket_custom_field(custom_field)) for custom_field in group_tree.findall('field')]
-            ticket_group = TicketCustomFieldGroup(cls._parse_int(tree.get('id')), tree.get('title'), fields)
+            fields = [TicketCustomField(api, **cls._parse_ticket_custom_field(custom_field, ticketid)) for custom_field in group_tree.findall('field')]
+            ticket_group = TicketCustomFieldGroup(cls._parse_int(group_tree.get('id')), group_tree.get('title'), fields)
             groups.append(ticket_group)
         return groups
 
