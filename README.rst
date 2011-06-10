@@ -67,6 +67,9 @@ Python API wrapper for Kayako 4.01.240
         ``api.get_all(TicketCustomField, ticketid)``
         	Return all ``TicketCustomFieldGroups`` for a ``Ticket`` with the given ID.
         	Returns a ``list`` of ``TicketCustomFieldGroups``.
+        	
+        ``api.get_all(TicketCount)``
+        	Returns only one object: ``TicketCount`` not a ``list`` of objects.
 
 ``api.filter(Object, args=(), kwargs={}, **filter)``
 
@@ -140,10 +143,12 @@ These methods can raise exceptions:
 	*1.1.4*
 	
 		- Requires Kayako 4.01.240, use 1.1.3 for Kayako 4.01.204
-		- TicketNote now supports get and delete
-		- Added api.ticket_search, see Misc API Calls for details.
+		- ``TicketNote`` now supports get and delete
+		- Added ``api.ticket_search``, see Misc API Calls for details.
 		- Refactored ticket module into ticket package. This could cause problems
 		  if things were not imported like ``from kayako.objects import X``
+		- Added ``TicketCount`` object. Use ``api.get_all(TicketCount)`` to
+		  retrieve.
 
 **Quick Reference**
 
@@ -156,6 +161,7 @@ StaffGroup        Yes                                                           
 Ticket            departmentid, ticketstatusid= -1, ownerstaffid= -1, userid= -1         Yes                       Yes     Yes     Yes
 TicketAttachment  ticketid                                                               ticketid, attachmentid    Yes     No      Yes
 TicketCustomField ticketid                                                               No                        No      No      No
+TicketCount       Yes                                                                    No                        No      No      No
 TicketNote        ticketid                                                               Yes                       Yes     No      Yes
 TicketPost        ticketid                                                               ticketid, postid          Yes     No      Yes
 TicketPriority    Yes                                                                    Yes                       No      No      No
