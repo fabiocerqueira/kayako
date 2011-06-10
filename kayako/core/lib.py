@@ -123,7 +123,7 @@ class NodeParser(object):
         elif value == 0:
             return FOREVER
         else:
-            return value
+            return datetime.fromtimestamp(value)
 
     @staticmethod
     def _get_int(node, required=True, strict=True):
