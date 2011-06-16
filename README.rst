@@ -266,11 +266,11 @@ These methods can raise exceptions:
 
     *1.1.5*
     
-    	- Fix Staff __str__
-		- Ticket __str__ includes displayid
-		- TicketPost subject is not returned in any responses, so it is not always available, removed it from __str__
+		- Fix ``Staff.__str__``.
+		- ``Ticket.__str__`` includes ``displayid``.
+		- ``TicketPost.subject`` is not returned in any responses, so it is not always available, removed it from ``TicketPost.__str__``.
 
-	*1.1.4*
+    *1.1.4*
 	
 		- Requires Kayako 4.01.240, use 1.1.3 for Kayako 4.01.204
 		- ``TicketNote`` now supports get and delete
