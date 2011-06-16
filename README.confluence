@@ -401,9 +401,9 @@ h2. Changes
 
 h3. 1.1.5
 
-* Fix Staff __str__
-* Ticket __str__ includes displayid
-* TicketPost subject is not returned in any responses, so it is not always available, removed it from __str__
+* Fix {{Staff.\__str__}}
+* {{Ticket.\__str__}} includes {{displayid}}
+* {{TicketPost.subject}} is not returned in any responses, so it is not always available, removed it from {{TicketPost.\__str__}}
 
 h3. 1.1.4
 
