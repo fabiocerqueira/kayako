@@ -130,7 +130,7 @@ class Staff(KayakoObject):
     def delete(self):
         self._delete('%s/%s/' % (self.controller, self.id))
 
-    def __repr__(self):
+    def __str__(self):
         return '<Staff (%s): %s %s (%s)>' % (self.id, self.firstname, self.lastname, self.username)
 
 class StaffGroup(KayakoObject):

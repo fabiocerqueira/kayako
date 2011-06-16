@@ -12,7 +12,7 @@ with open('kayako/README.txt') as readme:
 
 setup(
     name='kayako',
-    version='1.1.4',
+    version='1.1.5',
     description="Python API Wrapper for Kayako 4.01.240",
     long_description=long_description,
     author='Evan Leis',

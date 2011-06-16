@@ -278,4 +278,4 @@ class Ticket(KayakoObject):
         self._delete('%s/%s/' % (self.controller, self.id))
 
     def __str__(self):
-        return '<Ticket (%s): %s>' % (self.id, self.subject)
+        return '<Ticket (%s): %s - %s>' % (self.id, 'UNSUBMITTED' if not self.displayid else self.displayid, self.subject)

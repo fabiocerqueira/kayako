@@ -69,7 +69,7 @@ class TicketPost(KayakoObject):
         params = dict(
             id=cls._get_int(ticket_post_tree.find('id')),
             ticketid=ticket_id,
-            subject=cls._get_string(ticket_post_tree.find('subject')),
+            #subject=cls._get_string(ticket_post_tree.find('subject')), # Not updated
             contents=cls._get_string(ticket_post_tree.find('contents')),
             userid=cls._get_int(ticket_post_tree.find('userid')),
             staffid=cls._get_int(ticket_post_tree.find('staffid')),
@@ -98,7 +98,7 @@ class TicketPost(KayakoObject):
             if node is not None:
                 setattr(self, int_node, self._get_int(node, required=False))
 
-        for str_node in ['subject', 'contents', 'fullname', 'email', 'emailto', 'ipaddress']:
+        for str_node in ['contents', 'fullname', 'email', 'emailto', 'ipaddress']:
             node = ticket_post_tree.find(str_node)
             if node is not None:
                 setattr(self, str_node, self._get_string(node))
@@ -175,4 +175,4 @@ class TicketPost(KayakoObject):
         self._delete('%s/%s/%s/' % (self.controller, self.ticketid, self.id))
 
     def __str__(self):
-        return '<TicketPost (%s): %s>' % (self.id, self.subject)
+        return '<TicketPost (%s)%s>' % (self.id, '' if not self.contents else ': %s' if len(self.contents) < 20 else ': %s...' % self.contents[:20])

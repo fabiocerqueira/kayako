@@ -110,7 +110,7 @@ Add a User::
 	
 Add a Ticket and a TicketNote::
 
-	>>> from kayako import TicketStatus, TicketPriority
+	>>> from kayako import TicketStatus, TicketPriority, TicketType, TicketNote, TicketAttachment
 	>>>
 	>>> # Lets add a "Bug" Ticket to any Ticket Department, with "Open" status and "High" priority for a user. Lets use the user and department from above.
 	>>>
@@ -263,6 +263,12 @@ These methods can raise exceptions:
 	*Search tickets with a query in the specified fields*
         
 **Changes**
+
+    *1.1.5*
+    
+    	- Fix Staff __str__
+		- Ticket __str__ includes displayid
+		- TicketPost subject is not returned in any responses, so it is not always available, removed it from __str__
 
 	*1.1.4*
 	
