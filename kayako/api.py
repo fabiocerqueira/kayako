@@ -294,6 +294,9 @@ class KayakoAPI(object):
     
     ``api.ticket_search(query, ticketid=False, contents=False, author=False, email=False, creatoremail=False, fullname=False, notes=False, usergroup=False, userorganization=False, user=False, tags=False)``
         *Search tickets with a query in the specified fields*
+        
+    ``api.ticket_search_full(query)``
+        *Shorthand for ``api.ticket_search.`` Searches all fields.
             
     **Changes**
     
@@ -601,6 +604,10 @@ class KayakoAPI(object):
         response = self._request('/Tickets/TicketSearch', 'POST', query=query, ticketid=ticketid, contents=contents, author=author, email=email, creatoremail=creatoremail, fullname=fullname, notes=notes, usergroup=usergroup, userorganization=userorganization, user=user, tags=tags)
         ticket_xml = etree.parse(response)
         return [Ticket(self, **Ticket._parse_ticket(self, ticket_tree)) for ticket_tree in ticket_xml.findall('ticket')]
+
+    def ticket_search_full(self, query):
+        ''' Shorthand for ticket_search(query, ticketid=True, contents=True, author=True, email=True, creatoremail=True, fullname=True, notes=True, usergroup=True, userorganization=True, user=True, tags=True) '''
+        return self.ticket_search(query, ticketid=True, contents=True, author=True, email=True, creatoremail=True, fullname=True, notes=True, usergroup=True, userorganization=True, user=True, tags=True)
 
     def __str__(self):
         return '<KayakoAPI: %s>' % self.api_url

@@ -262,7 +262,13 @@ These methods can raise exceptions:
 ``api.ticket_search(query, ticketid=False, contents=False, author=False, email=False, creatoremail=False, fullname=False, notes=False, usergroup=False, userorganization=False, user=False, tags=False)``
 	*Search tickets with a query in the specified fields*
         
+``api.ticket_search_full(query)``
+    *Shorthand for ``api.ticket_search.`` Searches all fields.
+        
 **Changes**
+
+	*1.1.6*
+		- Added ``api.ticket_search_full`` shorthand function for searching all fields in ``api.ticket_search``
 
     *1.1.5*
     

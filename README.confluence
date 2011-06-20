@@ -395,9 +395,18 @@ h3. Misc API methods
 {code:language=Python}
 api.ticket_search(query, ticketid=False, contents=False, author=False, email=False, creatoremail=False, fullname=False, notes=False, usergroup=False, userorganization=False, user=False, tags=False)
 {code}
-Search tickets with a query in the specified fields
+Search {{Tickets}} with a query in the specified fields
+
+{code:language=Python}
+api.ticket_search_full(query)
+{code}
+Shorthand for searching all fields with {{api.ticket_search.}}
+
 
 h2. Changes
+
+h3. 1.1.6
+* Added ``api.ticket_search_full`` shorthand function for searching all fields in ``api.ticket_search``
 
 h3. 1.1.5
 

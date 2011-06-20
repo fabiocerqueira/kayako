@@ -181,6 +181,13 @@ class TestKayakoAPI(KayakoAPITest):
             raised = True
         assert raised
 
+    def test_ticket_search(self):
+        assert isinstance(self.api.ticket_search('testonly', ticketid=True), list)
+
+    def test_ticket_search_full(self):
+        assert isinstance(self.api.ticket_search_full('testonly'), list)
+
+
 
 
 
