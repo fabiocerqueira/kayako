@@ -4,3 +4,4 @@ bin/
 include/
 kayako.egg-info/
 lib/
+.settings/
