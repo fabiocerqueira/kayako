@@ -127,7 +127,7 @@ class User(KayakoObject):
         Returns the users starting at User ID ``marker`` pulling in a maximum
         ``maxitems`` number of Users.
         '''
-        response = api._request('%s/%s/%s/' % (cls.controller, marker, maxitems), 'GET')
+        response = api._request('%s/Filter/%s/%s/' % (cls.controller, marker, maxitems), 'GET')
         tree = etree.parse(response)
         return [User(api, **cls._parse_user(user_tree)) for user_tree in tree.findall('user')]
 
